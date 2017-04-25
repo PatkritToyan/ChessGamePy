@@ -9,6 +9,11 @@ from server import netstream
 from ChessGame import *
 from server import netstream
 
+try:
+    _toUtf8 = QString.toUtf8
+except AttributeError:
+    def _toUtf8(s):
+        return s
 
 try:
     _fromUtf8 = QString.fromUtf8
@@ -47,7 +52,7 @@ class ClientLogin_launcher(QWidget, Ui_Dialog):
         return True
 
     def login(self):
-        self.username = str(self.username_val.text()).strip()
+        self.username = str(_toUtf8(self.username_val.text())).strip()
         if self.username == "":
             QMessageBox.warning(self, _fromUtf8("警告"), _fromUtf8("昵称不能为空!"), QMessageBox.Yes)
         self.ip = str(self.ip_val.text()).strip()

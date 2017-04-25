@@ -52,7 +52,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     # 初始化UI
     def __init__ui(self):
         self.setupUi(self)
-        self.setWindowTitle(self.username)
+        self.setWindowTitle(_fromUtf8(self.username))
         self.userInfo = ChessBoard(self.username, self.chessboard, self.infotext)
         self.setButtonStatus(False, False, False, False, False)
         # 设置聊天框只读
@@ -159,7 +159,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 self.roomName.setText(
                     _fromUtf8('房间') + str(self.userInfo.roomId) + _fromUtf8('\n桌子') + str(self.userInfo.tableId))
                 self.infotext.setText(_fromUtf8('欢迎你坐下！'))
-                self.userone.setText(self.userInfo.name)
+                self.userone.setText(_fromUtf8(self.userInfo.name))
                 print self.username
                 # 获取对手的资料
                 msg1 = {'sid': 100, 'cid': 1004, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
@@ -181,7 +181,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 self.roomName.setText(
                     _fromUtf8('房间') + str(self.userInfo.roomId) + _fromUtf8('\n桌子') + str(self.userInfo.tableId))
                 self.infotext.setText(_fromUtf8('欢迎您'))
-                self.userone.setText(self.userInfo.name)
+                self.userone.setText(_fromUtf8(self.userInfo.name))
 
     # 客户端轮询
     def check(self):
@@ -205,7 +205,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     elif data['cid'] == 1004:  # 对手进来了 获取对手信息
                         if data['opponent'] != '':
                             self.userInfo.opponent = data['opponent']
-                            self.usertwo.setText(self.userInfo.opponent)
+                            self.usertwo.setText(_fromUtf8(self.userInfo.opponent))
                             self.singleChatEdit.setReadOnly(False)
                             self.setButtonStatus(True, False, False, True, True)
                     elif data['cid'] == 1005:
@@ -318,11 +318,13 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         else:
             self.tickCnt -= 1
 
-
+    # 更新桌子列表
     def updateRoom(self):
         # invisibelRootItem()得到的是所有节点的最终根节点
+        self.hallList.setHeaderLabel(_fromUtf8("大厅"))
         itemAncestor = self.hallList.invisibleRootItem()
         itemHall = itemAncestor.child(0)
+        itemHall.setText(0, '房间列表'.decode('utf-8'))
         roomCnt = itemHall.childCount()
         for i in range(roomCnt):
             itemRoom = itemHall.child(i)

@@ -42,7 +42,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     # 初始化配置信息
     def __init__config(self):
         # 显示每张桌子现有人数
-        self.tableList = [0 for i in range(25)]
+        self.tableList = [0 for i in range(100)]
         self.timer = QTimer()
         self.loopCnt = 40
         self.tickCnt = 100
@@ -143,7 +143,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             numOfRoom = parent_room.indexOfChild(parent_table)
         if numOfRoom != -1:
             # 桌子序号
-            index = numOfRoom * self.userInfo.tableLimit + numOfTable
+            index = numOfRoom * 10 + numOfTable
             # 获取桌子在座的人数
             numOfPlay = self.tableList[index]
             if numOfPlay == 2:
@@ -321,22 +321,26 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     # 更新桌子列表
     def updateRoom(self):
         # invisibelRootItem()得到的是所有节点的最终根节点
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+        logging.debug("updateRoom()  tableList:%s" % len(self.tableList))
         self.hallList.setHeaderLabel(_fromUtf8("大厅"))
         itemAncestor = self.hallList.invisibleRootItem()
         itemHall = itemAncestor.child(0)
         itemHall.setText(0, '房间列表'.decode('utf-8'))
         roomCnt = itemHall.childCount()
-        for i in range(roomCnt):
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+        logging.debug("updateRoom()  roomCnt:%s" % roomCnt)
+        for i in range(0,roomCnt):
             itemRoom = itemHall.child(i)
             index = 0
-            # 一个房间五个桌子
-            for j in range(0, 5):
-                index += self.tableList[i * 5 + j]
+            # 一个房间10个桌子
+            for j in range(0, 10):
+                index += self.tableList[i * 10 + j]
                 if itemRoom:
                     itemTable = itemRoom.child(j)
-                    itemTable.setText(0, '桌子'.decode('utf-8')+ str(j + 1) + '(' + str(self.tableList[i*5 + j]) +'/2)')
+                    itemTable.setText(0, '桌子'.decode('utf-8')+ str(j + 1) + '(' + str(self.tableList[i * 10 + j]) +'/2)')
             if itemRoom:
-                itemRoom.setText(0, '房间'.decode('utf-8') + str(i + 1) + '(' + str(index) + '/10)')
+                itemRoom.setText(0, '房间'.decode('utf-8') + str(i + 1) + '(' + str(index) + '/20)')
 
     def GoingChess(self, data):
         self.infotext.setText(_fromUtf8("可以正式比赛了"))

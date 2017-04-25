@@ -7,7 +7,7 @@ class TableShowService(object):
 
     def __init__(self):
         # 每张桌子现有人数列表
-        self.tableList = [0 for x in range(25)]
+        self.tableList = [0 for x in range(100)]
         # 显示每张桌子的用户列表
         self.userList = []
         # 显示每个用户当前的状态

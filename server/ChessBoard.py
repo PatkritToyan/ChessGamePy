@@ -36,7 +36,7 @@ class ChessBoard(object):
         self.name = username
         self.infotext = infotext
         self.gridWidth = 32
-        self.tableLimit = 5
+        self.limit = 5
         self.chessArray = [[(0, 0, self.NO_CHESS)] * 15 for i in range(0, 15)]
         self.chessStatus = [[(0, 0, self.NO_CHESS)] * 15 for i in range(0, 15)]
         self.path = []
@@ -109,8 +109,8 @@ class ChessBoard(object):
         other = self.WHITE_CHESS
         if self.chessType == self.WHITE_CHESS:
             other = self.BLACK_CHESS
-        x = float(n * self.gridWidth + self.tableLimit)
-        y = float(m * self.gridWidth + self.tableLimit)
+        x = float(n * self.gridWidth + self.limit)
+        y = float(m * self.gridWidth + self.limit)
         logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
         logging.debug("updateChessBoard() x: %s, y: %s " %  (x , y))
         # 绘制当前棋子

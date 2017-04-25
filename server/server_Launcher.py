@@ -46,6 +46,10 @@ if __name__ == '__main__':
                 server.userList[data['user']] = wparam
             else:
                 result = dispatch.dispatch(data)
+                logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                logging.debug("Server_Launcher() result: %s " % result)
+                logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                logging.debug("Server_Launcher() userList: %s " % server.userList)
                 # 将服务端处理完的数据返回给发送者
                 if result['sendType'] == 1:
                     server.host.send(wparam, json.dumps(result))
@@ -55,8 +59,6 @@ if __name__ == '__main__':
                         server.host.send(server.userList[user], json.dumps(result))
                 # 将服务端处理完的数据返回给 部分人
                 elif result['sendType'] == 3:
-                    logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                    logging.debug("Server_Launcher() result: %s " % result)
                     if result['userlist']:
                         for user in result['userlist']:
                             server.host.send(server.userList[user], json.dumps(result))

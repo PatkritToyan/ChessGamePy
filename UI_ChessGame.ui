@@ -101,12 +101,9 @@
      <item>
       <widget class="QLabel" name="userList">
        <property name="text">
-        <string>用户列表</string>
+        <string>排行榜</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QTextEdit" name="userListTitle"/>
      </item>
      <item>
       <widget class="QLabel" name="rule">
@@ -116,7 +113,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="textEdit_3"/>
+      <widget class="QListWidget" name="scoreList"/>
      </item>
      <item>
       <widget class="QLabel" name="singleRoomChatTitle">

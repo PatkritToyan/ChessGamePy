@@ -43,6 +43,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def __init__config(self):
         # 显示每张桌子现有人数
         self.tableList = [0 for i in range(100)]
+        # 得分情况
+        self.scoreList = {}
         self.timer = QTimer()
         self.loopCnt = 40
         self.tickCnt = 100
@@ -69,18 +71,16 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.connect(self.miniBt, SIGNAL("clicked()"), self.showMinimized)
         self.connect(self.sendGroupMsg, SIGNAL("clicked()"), self.sendGroupMsgEvent)
         self.connect(self.sendSingleMsg, SIGNAL("clicked()"), self.sendSingleMsgEvent)
-
-    def __init__connect(self):
-        # 进入房间
         self.hallList.itemDoubleClicked.connect(self.intoTable)
         # 触发定时器
         self.connect(self.timer, SIGNAL("timeout()"), self.check)
+
+
 
     # 连接服务器
     def connectToServer(self):
         self.__init__config()
         self.__init__ui()
-        self.__init__connect()
         self.timer.start(50)
 
     def setButtonStatus(self, readyStatus, giveupStatus, againStatus, leaveoutStatus,singleChatStatus):
@@ -222,10 +222,21 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         self.infotext.setText(_fromUtf8("很遗憾，你输了"))
                         self.setButtonStatus(False, False, True, True, True)
                         self.userInfo.IsNext = False
+                        msg = {'sid': 100, 'cid': 1009}
+                        self.ns.send(json.dumps(msg))
+                        self.ns.process()
                     elif data['cid'] == 1008:
                         self.infotext.setText(_fromUtf8("对方认输，你赢了"))
                         self.setButtonStatus(False, False, False, True, True)
                         self.userInfo.IsNext = False
+                        msg = {'sid': 100, 'cid': 1009}
+                        self.ns.send(json.dumps(msg))
+                        self.ns.process()
+                    elif data['cid'] == 1009:
+                        self.scoreList = data['scorelist']
+                        logging.basicConfig(level=logging.DEBUG,
+                                            format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                        logging.debug("check() ScoreList: %s " % self.scoreList)
                 elif data['sid'] == 101:
                     self.infotext.setText(_fromUtf8("欢迎你进入大厅"))
                     self.groupChatEdit.setReadOnly(False)
@@ -290,6 +301,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def client_config(self):
         # 更新房间桌子列表
         self.updateRoom()
+        # 更新排行榜
+        self.rank()
         # 第一次进来，配对用户名和hid
         if self.FirstTime:
             print str(self.userInfo.name)
@@ -321,15 +334,11 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     # 更新桌子列表
     def updateRoom(self):
         # invisibelRootItem()得到的是所有节点的最终根节点
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("updateRoom()  tableList:%s" % len(self.tableList))
         self.hallList.setHeaderLabel(_fromUtf8("大厅"))
         itemAncestor = self.hallList.invisibleRootItem()
         itemHall = itemAncestor.child(0)
         itemHall.setText(0, '房间列表'.decode('utf-8'))
         roomCnt = itemHall.childCount()
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("updateRoom()  roomCnt:%s" % roomCnt)
         for i in range(0,roomCnt):
             itemRoom = itemHall.child(i)
             index = 0
@@ -341,6 +350,30 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     itemTable.setText(0, '桌子'.decode('utf-8')+ str(j + 1) + '(' + str(self.tableList[i * 10 + j]) +'/2)')
             if itemRoom:
                 itemRoom.setText(0, '房间'.decode('utf-8') + str(i + 1) + '(' + str(index) + '/20)')
+
+    # 更新排行榜 只显示前三 不足前三时 有几个显示几个
+    def rank(self):
+        if self.scoreList:
+            tmpcnt = 0
+            newScoreList = sorted(self.scoreList.iteritems(), key=lambda d: d[1], reverse=True)
+            print newScoreList
+            self.scoreListWigdet.clear()
+            if len(newScoreList) >= 3:
+                self.scoreListWigdet.addItem("第一名：".decode('utf-8'))
+                self.scoreListWigdet.addItem(str(newScoreList[0][0]) + " : "+ str(newScoreList[0][1]) + "分".decode('utf-8'))
+                self.scoreListWigdet.addItem("第二名：".decode('utf-8'))
+                self.scoreListWigdet.addItem(str(newScoreList[1][0]) + " : "
+                                             + str(newScoreList[1][1]) + "分".decode('utf-8'))
+                self.scoreListWigdet.addItem("第三名：".decode('utf-8'))
+                self.scoreListWigdet.addItem(str(newScoreList[2][0]) + " : "
+                                             + str(newScoreList[2][1]) + "分".decode('utf-8'))
+            else:
+                for slist in newScoreList:
+                    tmpcnt += 1
+                    self.scoreListWigdet.addItem("第".decode('utf-8') + str(tmpcnt) + "名".decode('utf-8') +
+                                                 str(slist[0]) + " : " + str(slist[1]) + "分".decode('utf-8'))
+            self.scoreListWigdet.update()
+            tmpcnt = 0
 
     def GoingChess(self, data):
         self.infotext.setText(_fromUtf8("可以正式比赛了"))

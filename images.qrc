@@ -1,0 +1,11 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+<file alias="images/black.png">images/black.png</file>
+<file alias="images/blackchess.png">images/blackchess.png</file>
+<file alias="images/chessboard.png">images/chessboard.png</file>
+<file alias="images/chesslogo.png">images/chesslogo.png</file>
+<file alias="images/white.png">images/white.png</file>
+<file alias="images/whitechess.png">images/whitechess.png</file>
+</qresource>
+</RCC>

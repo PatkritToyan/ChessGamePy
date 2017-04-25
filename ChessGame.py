@@ -165,6 +165,9 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 msg1 = {'sid': 100, 'cid': 1004, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
                 self.ns.send(json.dumps(msg1))
                 self.ns.process()
+                msg2 = {'sid': 100, 'cid': 1009}
+                self.ns.send(json.dumps(msg2))
+                self.ns.process()
             else:
                 QMessageBox.information(self,_fromUtf8("提示"),_fromUtf8("您已进入房间，等待您的对手进入房间！"))
                 print "inRoom" + self.username
@@ -182,6 +185,9 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     _fromUtf8('房间') + str(self.userInfo.roomId) + _fromUtf8('\n桌子') + str(self.userInfo.tableId))
                 self.infotext.setText(_fromUtf8('欢迎您'))
                 self.userone.setText(_fromUtf8(self.userInfo.name))
+                msg2 = {'sid': 100, 'cid': 1009}
+                self.ns.send(json.dumps(msg2))
+                self.ns.process()
 
     # 客户端轮询
     def check(self):
@@ -360,18 +366,18 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             self.scoreListWigdet.clear()
             if len(newScoreList) >= 3:
                 self.scoreListWigdet.addItem("第一名：".decode('utf-8'))
-                self.scoreListWigdet.addItem(str(newScoreList[0][0]) + " : "+ str(newScoreList[0][1]) + "分".decode('utf-8'))
+                self.scoreListWigdet.addItem(newScoreList[0][0] + " : " + str(newScoreList[0][1]) + "分".decode('utf-8'))
                 self.scoreListWigdet.addItem("第二名：".decode('utf-8'))
-                self.scoreListWigdet.addItem(str(newScoreList[1][0]) + " : "
+                self.scoreListWigdet.addItem(newScoreList[1][0] + " : "
                                              + str(newScoreList[1][1]) + "分".decode('utf-8'))
                 self.scoreListWigdet.addItem("第三名：".decode('utf-8'))
-                self.scoreListWigdet.addItem(str(newScoreList[2][0]) + " : "
+                self.scoreListWigdet.addItem(newScoreList[2][0] + " : "
                                              + str(newScoreList[2][1]) + "分".decode('utf-8'))
             else:
                 for slist in newScoreList:
                     tmpcnt += 1
-                    self.scoreListWigdet.addItem("第".decode('utf-8') + str(tmpcnt) + "名".decode('utf-8') +
-                                                 str(slist[0]) + " : " + str(slist[1]) + "分".decode('utf-8'))
+                    self.scoreListWigdet.addItem("第".decode('utf-8') + str(tmpcnt) + "名".decode('utf-8') + " : ")
+                    self.scoreListWigdet.addItem(slist[0] + " : " + str(slist[1]) + "分".decode('utf-8'))
             self.scoreListWigdet.update()
             tmpcnt = 0
 

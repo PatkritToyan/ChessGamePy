@@ -13,7 +13,7 @@ class Server_Launcher(object):
 
     def __init__(self):
         self.host = nethost(8)
-        self.host.startup(2000)
+        self.host.startup(9999)
         print('service startup at port', self.host.port)
         self.host.settimer(2000)
         self.userList = {}

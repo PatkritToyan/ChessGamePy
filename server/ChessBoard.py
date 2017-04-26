@@ -106,19 +106,20 @@ class ChessBoard(object):
 
     # 更新棋盘
     def updateChessBoard(self, n, m):
-        other = self.WHITE_CHESS
+        oppo = self.WHITE_CHESS
         if self.chessType == self.WHITE_CHESS:
-            other = self.BLACK_CHESS
+            oppo = self.BLACK_CHESS
+
         x = float(n * self.gridWidth + self.limit)
         y = float(m * self.gridWidth + self.limit)
         logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
         logging.debug("updateChessBoard() x: %s, y: %s " %  (x , y))
         # 绘制当前棋子
-        self.chessArray[n][m] = (x, y, other)
+        self.chessArray[n][m] = (x, y, oppo)
         self.path.append([n, m])
         self.chessArray[n][m] = QGraphicsView(self.chessboard)
         self.chessArray[n][m].setGeometry(QRect(32 * n, 32 * m, 32, 32))
-        if other == self.BLACK_CHESS:
+        if oppo == self.BLACK_CHESS:
             self.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/blackchess.png);"))
         else:
             self.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/whitechess.png);"))

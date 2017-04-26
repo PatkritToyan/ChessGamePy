@@ -8,6 +8,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from UI_ChessGame import Ui_MainWindow
 import logging
+
 # from server import ChessBoard
 
 
@@ -30,8 +31,8 @@ except AttributeError:
     def _toUtf8(s):
         return s
 
-class ChessGame(QMainWindow, Ui_MainWindow):
 
+class ChessGame(QMainWindow, Ui_MainWindow):
     def __init__(self, ip, port, username, ns):
         QMainWindow.__init__(self, None)
         self.ip = ip
@@ -55,6 +56,22 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def __init__ui(self):
         self.setupUi(self)
         self.setWindowTitle(_fromUtf8(self.username))
+        self.appName.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 18px; font-weight: bold; color: #FF6A6A"))
+        self.textEdit_3.setStyleSheet(_fromUtf8("font-family: 宋体; font-size: 12px; color: #8B2500"))
+        self.rule.setStyleSheet(_fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.singleRoomChatTitle.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.groupChatTitle.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.userRankList.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.hallList.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.userone.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.usertwo.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
         self.userInfo = ChessBoard(self.username, self.chessboard, self.infotext)
         self.setButtonStatus(False, False, False, False, False)
         # 设置聊天框只读
@@ -62,7 +79,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         # self.groupChatEdit.setReadOnly(True)
         self.singleChatRoom.setReadOnly(True)
         self.groupChatRoom.setReadOnly(True)
-
+        # self.blackChess.setCheckable(False)
+        # self.whiteChess.setCheckable(False)
         self.connect(self.readyBt, SIGNAL("clicked()"), self.readyChess)
         self.connect(self.giveUpBt, SIGNAL("clicked()"), self.giveUpChess)
         self.connect(self.againBt, SIGNAL("clicked()"), self.againChess)
@@ -75,15 +93,13 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         # 触发定时器
         self.connect(self.timer, SIGNAL("timeout()"), self.check)
 
-
-
     # 连接服务器
     def connectToServer(self):
         self.__init__config()
         self.__init__ui()
         self.timer.start(50)
 
-    def setButtonStatus(self, readyStatus, giveupStatus, againStatus, leaveoutStatus,singleChatStatus):
+    def setButtonStatus(self, readyStatus, giveupStatus, againStatus, leaveoutStatus, singleChatStatus):
         self.readyBt.setEnabled(readyStatus)
         self.giveUpBt.setEnabled(giveupStatus)
         self.againBt.setEnabled(againStatus)
@@ -94,28 +110,31 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def readyChess(self):
         self.setButtonStatus(False, True, False, False, True)
         self.userInfo.IsReady = True
-        msg = {'sid': 100, 'cid': 1005, 'message': 'begin', 'user': str(self.userInfo.name), 'opponent': self.userInfo.opponent}
+        msg = {'sid': 100, 'cid': 1005, 'message': 'begin', 'user': str(self.userInfo.name),
+               'opponent': self.userInfo.opponent}
         self.ns.send(json.dumps(msg))
 
     # 认输
     def giveUpChess(self):
         self.setButtonStatus(False, False, False, True, True)
         self.userInfo.IsNext = False
-        msg = {'sid': 100, 'cid': 1008, 'winner': self.userInfo.opponent, 'loser': self.userInfo.name, 'chessType': self.userInfo.chessType}
+        msg = {'sid': 100, 'cid': 1008, 'winner': self.userInfo.opponent, 'loser': self.userInfo.name,
+               'chessType': self.userInfo.chessType}
         self.ns.send(json.dumps(msg))
         self.ns.process()
         self.infotext.setText(_fromUtf8('你认输了'))
 
     # 再玩一局
     def againChess(self):
-        msg = {'sid': 104, 'cid': 1001, 'message': 'again', 'userlist': [self.userInfo.opponent], 'user': self.userInfo.name}
+        msg = {'sid': 104, 'cid': 1001, 'message': 'again', 'userlist': [self.userInfo.opponent],
+               'user': self.userInfo.name}
         self.ns.send(json.dumps(msg))
 
     # 离开房间
     def leaveOutChess(self):
         self.userInfo.clearChessBoard()
         self.userInfo.IsInRoom = False
-        msg = {'sid': 100, 'cid': 1003, 'roomid': self.userInfo.roomId -1,
+        msg = {'sid': 100, 'cid': 1003, 'roomid': self.userInfo.roomId - 1,
                'tableid': self.userInfo.tableId - 1, 'user': self.userInfo.name,
                'opponent': self.userInfo.opponent}
         self.ns.send(json.dumps(msg))
@@ -147,9 +166,9 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             # 获取桌子在座的人数
             numOfPlay = self.tableList[index]
             if numOfPlay == 2:
-                QMessageBox.information(self,_fromUtf8('提示'), _fromUtf8("桌子人数已满，请选择其它桌子！"))
+                QMessageBox.information(self, _fromUtf8('提示'), _fromUtf8("桌子人数已满，请选择其它桌子！"))
             elif numOfPlay == 1:
-                QMessageBox.information(self,_fromUtf8('提示'), _fromUtf8("你已经进入房间，马上开始游戏吧！"))
+                QMessageBox.information(self, _fromUtf8('提示'), _fromUtf8("你已经进入房间，马上开始游戏吧！"))
                 msg = {'sid': 100, 'cid': 1002, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
                 self.ns.send(json.dumps(msg))
                 self.userInfo.IsInRoom = True
@@ -160,7 +179,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     _fromUtf8('房间') + str(self.userInfo.roomId) + _fromUtf8('\n桌子') + str(self.userInfo.tableId))
                 self.infotext.setText(_fromUtf8('欢迎你坐下！'))
                 self.userone.setText(_fromUtf8(self.userInfo.name))
-                print self.username
                 # 获取对手的资料
                 msg1 = {'sid': 100, 'cid': 1004, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
                 self.ns.send(json.dumps(msg1))
@@ -169,9 +187,9 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 self.ns.send(json.dumps(msg2))
                 self.ns.process()
             else:
-                QMessageBox.information(self,_fromUtf8("提示"),_fromUtf8("您已进入房间，等待您的对手进入房间！"))
+                QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("您已进入房间，等待您的对手进入房间！"))
                 print "inRoom" + self.username
-                print type(self.username)
+                # print type(self.username)
                 data = {'sid': 100, 'cid': 1002, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
                 self.ns.send(json.dumps(data))
                 self.ns.process()
@@ -188,6 +206,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 msg2 = {'sid': 100, 'cid': 1009}
                 self.ns.send(json.dumps(msg2))
                 self.ns.process()
+                # 更新用户分数
 
     # 客户端轮询
     def check(self):
@@ -217,6 +236,16 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     elif data['cid'] == 1005:
                         if data['message'] == u'begin':
                             # 开始比赛
+                            if data['white'] == self.userInfo.name:
+                                self.blackChess.setChecked(False)
+                                self.whiteChess.setChecked(True)
+                                self.blackChess.update()
+                                self.whiteChess.update()
+                            elif data['white'] == self.userInfo.opponent:
+                                self.blackChess.setChecked(True)
+                                self.whiteChess.setChecked(False)
+                                self.blackChess.update()
+                                self.whiteChess.update()
                             self.GoingChess(data)
                         else:
                             self.infotext.setText(_fromUtf8('还有一方未准备!'))
@@ -224,6 +253,16 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         n = data['n']
                         m = data['m']
                         self.userInfo.updateChessBoard(n, m)
+                        if self.userInfo.chessType == self.userInfo.WHITE_CHESS:
+                            self.blackChess.setChecked(False)
+                            self.whiteChess.setChecked(True)
+                            self.blackChess.update()
+                            self.whiteChess.update()
+                        elif self.userInfo.chessType == self.userInfo.BLACK_CHESS:
+                            self.blackChess.setChecked(True)
+                            self.whiteChess.setChecked(False)
+                            self.blackChess.update()
+                            self.whiteChess.update()
                     elif data['cid'] == 1007:
                         self.infotext.setText(_fromUtf8("很遗憾，你输了"))
                         self.setButtonStatus(False, False, True, True, True)
@@ -249,7 +288,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     self.sendGroupMsg.setEnabled(True)
                 elif data['sid'] == 104:
                     if data['cid'] == 1001:
-                        replay = QMessageBox.question(self, _fromUtf8("再玩一局"),_fromUtf8("你的对手请求再来一局，是否同意？"), QMessageBox.Yes, QMessageBox.No)
+                        replay = QMessageBox.question(self, _fromUtf8("再玩一局"), _fromUtf8("你的对手请求再来一局，是否同意？"),
+                                                      QMessageBox.Yes, QMessageBox.No)
                         if replay == QMessageBox.Yes:
                             data = {'sid': 104, 'cid': 1002, 'replay': 'yes', 'userlist': [self.userInfo.opponent],
                                     'white': self.userInfo.name}
@@ -260,7 +300,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             # 正式开始比赛
                             self.GoingChess(data)
                         else:
-                            data = {'sid': 104, 'cid': 1002, 'replay': 'no', 'userlist':[self.userInfo.opponent]}
+                            data = {'sid': 104, 'cid': 1002, 'replay': 'no', 'userlist': [self.userInfo.opponent]}
                             self.ns.send(json.dumps(data))
                             self.ns.process()
                     elif data['cid'] == 1002:
@@ -311,7 +351,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.rank()
         # 第一次进来，配对用户名和hid
         if self.FirstTime:
-            print str(self.userInfo.name)
+            # print str(self.userInfo.name)
             msg = {'sid': 103, 'cid': 1001, 'user': self.userInfo.name}
             self.ns.send(json.dumps(msg))
             self.ns.process()
@@ -320,7 +360,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         if self.userInfo.opponent == None and self.loopCnt == 0:
             self.loopCnt = 40
             if self.userInfo.tableId != -1:
-                data1 = {'sid': 100, 'cid': 1004, 'roomid': self.userInfo.roomId - 1, 'tableid': self.userInfo.tableId - 1,
+                data1 = {'sid': 100, 'cid': 1004, 'roomid': self.userInfo.roomId - 1,
+                         'tableid': self.userInfo.tableId - 1,
                          'user': self.userInfo.name}
                 self.ns.send(json.dumps(data1))
                 self.ns.process()
@@ -341,11 +382,12 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def updateRoom(self):
         # invisibelRootItem()得到的是所有节点的最终根节点
         self.hallList.setHeaderLabel(_fromUtf8("大厅"))
+
         itemAncestor = self.hallList.invisibleRootItem()
         itemHall = itemAncestor.child(0)
         itemHall.setText(0, '房间列表'.decode('utf-8'))
         roomCnt = itemHall.childCount()
-        for i in range(0,roomCnt):
+        for i in range(0, roomCnt):
             itemRoom = itemHall.child(i)
             index = 0
             # 一个房间10个桌子
@@ -353,7 +395,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 index += self.tableList[i * 10 + j]
                 if itemRoom:
                     itemTable = itemRoom.child(j)
-                    itemTable.setText(0, '桌子'.decode('utf-8')+ str(j + 1) + '(' + str(self.tableList[i * 10 + j]) +'/2)')
+                    itemTable.setText(0,
+                                      '桌子'.decode('utf-8') + str(j + 1) + '(' + str(self.tableList[i * 10 + j]) + '/2)')
             if itemRoom:
                 itemRoom.setText(0, '房间'.decode('utf-8') + str(i + 1) + '(' + str(index) + '/20)')
 
@@ -362,7 +405,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         if self.scoreList:
             tmpcnt = 0
             newScoreList = sorted(self.scoreList.iteritems(), key=lambda d: d[1], reverse=True)
-            print newScoreList
+            # print newScoreList
             self.scoreListWigdet.clear()
             if len(newScoreList) >= 3:
                 self.scoreListWigdet.addItem("第一名：".decode('utf-8'))
@@ -398,8 +441,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
 
     def releaseAction(self, event):
         if event.button() == Qt.LeftButton:
-            print event.pos().x()
-            print event.pos().y()
+            # print event.pos().x()
+            # print event.pos().y()
             self.paint(event.pos().x(), event.pos().y())
 
     # 绘制棋子
@@ -415,7 +458,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             self.setButtonStatus(False, False, False, True, True)
             self.infotext.setText(_fromUtf8('恭喜你赢了'))
             data = {'sid': 100, 'cid': 1007, 'winner': self.userInfo.name, 'loser': self.userInfo.opponent, 'chessType':
-                    self.userInfo.chessType}
+                self.userInfo.chessType}
             self.ns.send(json.dumps(data))
         self.ns.process()
 
@@ -448,7 +491,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             data = {'sid': 106, 'cid': 1003, 'message': stalkMsg,
                     'userlist': [self.userInfo.name], 'user': self.userInfo.name}
         else:
-            data = {'sid': 106, 'cid': 1003, 'message': stalkMsg, 'userlist': [self.userInfo.opponent, self.userInfo.name], 'user':self.userInfo.name}
+            data = {'sid': 106, 'cid': 1003, 'message': stalkMsg,
+                    'userlist': [self.userInfo.opponent, self.userInfo.name], 'user': self.userInfo.name}
         logging.debug("sendGroupMsgEvent data userlist() %s" % data['userlist'])
         self.ns.send(json.dumps(data))
         self.ns.process()

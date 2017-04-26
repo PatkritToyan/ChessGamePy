@@ -56,22 +56,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def __init__ui(self):
         self.setupUi(self)
         self.setWindowTitle(_fromUtf8(self.username))
-        self.appName.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 18px; font-weight: bold; color: #FF6A6A"))
-        self.textEdit_3.setStyleSheet(_fromUtf8("font-family: 宋体; font-size: 12px; color: #8B2500"))
-        self.rule.setStyleSheet(_fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.singleRoomChatTitle.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.groupChatTitle.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.userRankList.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.hallList.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
-        self.userone.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
-        self.usertwo.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.setUiStyleSheet()
         self.userInfo = ChessBoard(self.username, self.chessboard, self.infotext)
         self.setButtonStatus(False, False, False, False, False)
         # 设置聊天框只读
@@ -98,6 +83,24 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.__init__config()
         self.__init__ui()
         self.timer.start(50)
+
+    def setUiStyleSheet(self):
+        self.appName.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 18px; font-weight: bold; color: #FF6A6A"))
+        self.textEdit_3.setStyleSheet(_fromUtf8("font-family: 宋体; font-size: 12px; color: #8B2500"))
+        self.rule.setStyleSheet(_fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.singleRoomChatTitle.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.groupChatTitle.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.userRankList.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.hallList.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.userone.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.usertwo.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
 
     def setButtonStatus(self, readyStatus, giveupStatus, againStatus, leaveoutStatus, singleChatStatus):
         self.readyBt.setEnabled(readyStatus)
@@ -297,6 +300,10 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             self.ns.process()
                             # 清除棋盘
                             self.userInfo.clearChessBoard()
+                            self.blackChess.setChecked(False)
+                            self.whiteChess.setChecked(True)
+                            self.blackChess.update()
+                            self.whiteChess.update()
                             # 正式开始比赛
                             self.GoingChess(data)
                         else:
@@ -308,6 +315,10 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("对手同意再来一局"))
                             # 清除棋盘
                             self.userInfo.clearChessBoard()
+                            self.blackChess.setChecked(True)
+                            self.whiteChess.setChecked(False)
+                            self.blackChess.update()
+                            self.whiteChess.update()
                             # 正式开始比赛
                             self.GoingChess(data)
                         else:

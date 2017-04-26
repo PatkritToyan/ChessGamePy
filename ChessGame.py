@@ -242,11 +242,15 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         if data['message'] == u'begin':
                             # 开始比赛
                             if data['white'] == self.userInfo.name:
+                                self.blackChess.setCheckable(False)
+                                self.whiteChess.setCheckable(True)
                                 self.blackChess.setChecked(False)
                                 self.whiteChess.setChecked(True)
                                 self.blackChess.update()
                                 self.whiteChess.update()
                             elif data['white'] == self.userInfo.opponent:
+                                self.blackChess.setCheckable(True)
+                                self.whiteChess.setCheckable(False)
                                 self.blackChess.setChecked(True)
                                 self.whiteChess.setChecked(False)
                                 self.blackChess.update()
@@ -259,11 +263,15 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         m = data['m']
                         self.userInfo.updateChessBoard(n, m)
                         if self.userInfo.chessType == self.userInfo.WHITE_CHESS:
+                            self.blackChess.setCheckable(False)
+                            self.whiteChess.setCheckable(True)
                             self.blackChess.setChecked(False)
                             self.whiteChess.setChecked(True)
                             self.blackChess.update()
                             self.whiteChess.update()
                         elif self.userInfo.chessType == self.userInfo.BLACK_CHESS:
+                            self.blackChess.setCheckable(True)
+                            self.whiteChess.setCheckable(False)
                             self.blackChess.setChecked(True)
                             self.whiteChess.setChecked(False)
                             self.blackChess.update()
@@ -301,6 +309,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             self.ns.send(json.dumps(data))
                             self.ns.process()
                             # 清除棋盘
+                            self.blackChess.setCheckable(False)
+                            self.whiteChess.setCheckable(True)
                             self.userInfo.clearChessBoard()
                             self.blackChess.setChecked(False)
                             self.whiteChess.setChecked(True)
@@ -317,6 +327,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("对手同意再来一局"))
                             # 清除棋盘
                             self.userInfo.clearChessBoard()
+                            self.blackChess.setCheckable(True)
+                            self.whiteChess.setCheckable(False)
                             self.blackChess.setChecked(True)
                             self.whiteChess.setChecked(False)
                             self.blackChess.update()
@@ -395,8 +407,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def updateRoom(self):
         # invisibelRootItem()得到的是所有节点的最终根节点
         self.hallList.setHeaderLabel(_fromUtf8("大厅"))
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("updateRoom() tableList:%s" % self.tableList)
+        # logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+        # logging.debug("updateRoom() tableList:%s" % self.tableList)
         itemAncestor = self.hallList.invisibleRootItem()
         itemHall = itemAncestor.child(0)
         itemHall.setText(0, '房间列表'.decode('utf-8'))

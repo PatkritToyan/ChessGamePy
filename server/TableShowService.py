@@ -15,7 +15,7 @@ class TableShowService(object):
         self.state = {}
         # 每个用户的得分列表
         self.scoreList = {}
-        for i in range(25):
+        for i in range(100):
             self.userList.append([])
         commands = {
             1001: self.getTableList,
@@ -53,7 +53,7 @@ class TableShowService(object):
 
     # 玩家进入房间 初始化得分dict
     def userIn(self, msg):
-        numOfTable = msg['roomid'] * 5 + msg['tableid']
+        numOfTable = msg['roomid'] * 10 + msg['tableid']
         if self.tableList[numOfTable] < 2:
             self.tableList[numOfTable] += 1
         self.userList[numOfTable].append(msg['user'])
@@ -67,7 +67,7 @@ class TableShowService(object):
 
     # 玩家离开房间
     def userOut(self, msg):
-        numOfTable = msg['roomid'] * 5 + msg['tableid']
+        numOfTable = msg['roomid'] * 10 + msg['tableid']
         if self.tableList[numOfTable] > 0:
             self.tableList[numOfTable] -= 1
         self.userList[numOfTable].remove(msg['user'])
@@ -81,7 +81,7 @@ class TableShowService(object):
 
     # 获取对手信息
     def getOpponent(self, msg):
-        numOfTable = msg['roomid'] * 5 + msg['tableid']
+        numOfTable = msg['roomid'] * 10 + msg['tableid']
         opponent = ''
         for i in self.userList[numOfTable]:
             if i != msg['user']:

@@ -193,6 +193,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("您已进入房间，等待您的对手进入房间！"))
                 print "inRoom" + self.username
                 # print type(self.username)
+                logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                logging.debug("inToTable() roomid: %s,tableid: %s" % (numOfRoom, numOfTable))
                 data = {'sid': 100, 'cid': 1002, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
                 self.ns.send(json.dumps(data))
                 self.ns.process()
@@ -393,7 +395,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def updateRoom(self):
         # invisibelRootItem()得到的是所有节点的最终根节点
         self.hallList.setHeaderLabel(_fromUtf8("大厅"))
-
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+        logging.debug("updateRoom() tableList:%s" % self.tableList)
         itemAncestor = self.hallList.invisibleRootItem()
         itemHall = itemAncestor.child(0)
         itemHall.setText(0, '房间列表'.decode('utf-8'))

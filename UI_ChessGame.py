@@ -193,7 +193,7 @@ class Ui_MainWindow(object):
         self.textEdit_3.append(_fromUtf8('1.棋盘'))
         self.textEdit_3.append(_fromUtf8('  五子棋专用棋盘为 15×15,盘面有纵横各十五条等距离垂直交叉的平行线构成,共225个交叉点\n'))
         self.textEdit_3.append(_fromUtf8('2.下棋顺序'))
-        self.textEdit_3.append(_fromUtf8('  黑先白后，系统选定黑白方\n'))
+        self.textEdit_3.append(_fromUtf8('  黑先白后，第一次进房间系统随机分配黑白方，再玩一局的时候输者为黑棋\n'))
         self.textEdit_3.append(_fromUtf8('3.判定胜负'))
         self.textEdit_3.append(_fromUtf8('  最先在棋盘横向、竖向、斜向形成连续的相同颜色五个棋子的一方获胜\n'))
         self.textEdit_3.setReadOnly(True)

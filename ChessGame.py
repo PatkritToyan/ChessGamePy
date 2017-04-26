@@ -104,6 +104,13 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
         self.usertwo.setStyleSheet(
             _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.scoreStatus1.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#8B1A1A"))
+        self.scoreStatus2.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#8B1A1A"))
+        self.scoreListWigdet.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#9ACD32")
+        )
 
     def setButtonStatus(self, readyStatus, giveupStatus, againStatus, leaveoutStatus, singleChatStatus):
         self.readyBt.setEnabled(readyStatus)
@@ -192,6 +199,18 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 msg2 = {'sid': 100, 'cid': 1009}
                 self.ns.send(json.dumps(msg2))
                 self.ns.process()
+                # 更新选手得分
+                if not self.userInfo.name in self.scoreList.keys():
+                    self.scoreStatus1.setText("0 " + _fromUtf8("分"))
+                else:
+                    self.scoreStatus1.setText(self.scoreList[self.userInfo.name])
+                self.scoreStatus1.update()
+                # 更新对手得分
+                if not self.userInfo.opponent in self.scoreList.keys():
+                    self.scoreStatus2.setText("0 " + _fromUtf8("分"))
+                else:
+                    self.scoreStatus2.setText(self.scoreList[self.userInfo.opponent])
+                self.scoreStatus2.update()
             else:
                 QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("您已进入房间，等待您的对手进入房间！"))
                 print "inRoom" + self.username
@@ -214,7 +233,12 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 msg2 = {'sid': 100, 'cid': 1009}
                 self.ns.send(json.dumps(msg2))
                 self.ns.process()
-                # 更新用户分数
+                # 更新自己得分
+                if not self.userInfo.name in self.scoreList.keys():
+                    self.scoreStatus1.setText("0 " + _fromUtf8("分"))
+                else:
+                    self.scoreStatus1.setText(self.scoreList[self.userInfo.name])
+                self.scoreStatus1.update()
 
     # 客户端轮询
     def check(self):
@@ -437,18 +461,18 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             # print newScoreList
             self.scoreListWigdet.clear()
             if len(newScoreList) >= 3:
-                self.scoreListWigdet.addItem("第一名：".decode('utf-8'))
+                self.scoreListWigdet.addItem("第一名".decode('utf-8'))
                 self.scoreListWigdet.addItem(newScoreList[0][0] + " : " + str(newScoreList[0][1]) + "分".decode('utf-8'))
-                self.scoreListWigdet.addItem("第二名：".decode('utf-8'))
+                self.scoreListWigdet.addItem("第二名".decode('utf-8'))
                 self.scoreListWigdet.addItem(newScoreList[1][0] + " : "
                                              + str(newScoreList[1][1]) + "分".decode('utf-8'))
-                self.scoreListWigdet.addItem("第三名：".decode('utf-8'))
+                self.scoreListWigdet.addItem("第三名".decode('utf-8'))
                 self.scoreListWigdet.addItem(newScoreList[2][0] + " : "
                                              + str(newScoreList[2][1]) + "分".decode('utf-8'))
             else:
                 for slist in newScoreList:
                     tmpcnt += 1
-                    self.scoreListWigdet.addItem("第".decode('utf-8') + str(tmpcnt) + "名".decode('utf-8') + " : ")
+                    self.scoreListWigdet.addItem("第".decode('utf-8') + str(tmpcnt) + "名".decode('utf-8'))
                     self.scoreListWigdet.addItem(slist[0] + " : " + str(slist[1]) + "分".decode('utf-8'))
             self.scoreListWigdet.update()
             tmpcnt = 0

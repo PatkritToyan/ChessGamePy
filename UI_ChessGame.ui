@@ -168,7 +168,7 @@
          <item>
           <widget class="QLabel" name="chessStatus1">
            <property name="text">
-            <string>您的棋子是</string>
+            <string>您的积分</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -253,7 +253,7 @@
          <item>
           <widget class="QLabel" name="chessStatus2">
            <property name="text">
-            <string>您的棋子是</string>
+            <string>您的积分</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>

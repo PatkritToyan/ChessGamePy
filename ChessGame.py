@@ -212,24 +212,12 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 msg2 = {'sid': 100, 'cid': 1009}
                 self.ns.send(json.dumps(msg2))
                 self.ns.process()
-                # 更新选手得分
-                if not self.userInfo.name in self.scoreList.keys():
-                    self.scoreStatus1.setText("0 " + _fromUtf8("分"))
-                else:
-                    self.scoreStatus1.setText(self.scoreList[self.userInfo.name])
-                self.scoreStatus1.update()
-                # 更新对手得分
-                if not self.userInfo.opponent in self.scoreList.keys():
-                    self.scoreStatus2.setText("0 " + _fromUtf8("分"))
-                else:
-                    self.scoreStatus2.setText(self.scoreList[self.userInfo.opponent])
-                self.scoreStatus2.update()
             else:
                 QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("您已进入房间，等待您的对手进入房间！"))
                 print "inRoom" + self.username
                 # print type(self.username)
-                logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                logging.debug("inToTable() roomid: %s,tableid: %s" % (numOfRoom, numOfTable))
+                # logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                # logging.debug("inToTable() roomid: %s,tableid: %s" % (numOfRoom, numOfTable))
                 data = {'sid': 100, 'cid': 1002, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
                 self.ns.send(json.dumps(data))
                 self.ns.process()
@@ -246,12 +234,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 msg2 = {'sid': 100, 'cid': 1009}
                 self.ns.send(json.dumps(msg2))
                 self.ns.process()
-                # 更新自己得分
-                if not self.userInfo.name in self.scoreList.keys():
-                    self.scoreStatus1.setText("0 " + _fromUtf8("分"))
-                else:
-                    self.scoreStatus1.setText(self.scoreList[self.userInfo.name])
-                self.scoreStatus1.update()
 
     # 客户端轮询
     def check(self):
@@ -273,7 +255,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             self.setButtonStatus(False, False, False, False, True, False)
                             self.userInfo.opponent = None
                             self.usertwo.setText(_fromUtf8('玩家二'))
-                            self.scoreStatus2.setText("0" + _fromUtf8("分"))
+                            # self.scoreStatus2.setText("0" + _fromUtf8("分"))
                     elif data['cid'] == 1004:  # 对手进来了 获取对手信息
                         if data['opponent'] != '':
                             self.userInfo.opponent = data['opponent']
@@ -342,17 +324,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         logging.basicConfig(level=logging.DEBUG,
                                             format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
                         logging.debug("check() ScoreList: %s " % self.scoreList)
-                        if not self.userInfo.name in self.scoreList.keys():
-                            self.scoreStatus1.setText("0 " + _fromUtf8("分"))
-                        else:
-                            self.scoreStatus1.setText(str(self.scoreList[self.userInfo.name]) + _fromUtf8("分"))
-                        self.scoreStatus1.update()
-                        # 更新对手得分
-                        if not self.userInfo.opponent in self.scoreList.keys():
-                            self.scoreStatus2.setText("0 " + _fromUtf8("分"))
-                        else:
-                            self.scoreStatus2.setText(str(self.scoreList[self.userInfo.opponent]) + _fromUtf8("分"))
-                        self.scoreStatus2.update()
                     elif data['cid'] == 1010:
                         self.infotext.setText(_fromUtf8("和棋！"))
                         self.setButtonStatus(False, False, False, True, True, True)
@@ -457,9 +428,10 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.updateRoom()
         # 更新排行榜
         self.rank()
+        # 更新得分
+        self.updateScore()
         # 第一次进来，配对用户名和hid
         if self.FirstTime:
-            # print str(self.userInfo.name)
             msg = {'sid': 103, 'cid': 1001, 'user': self.userInfo.name}
             self.ns.send(json.dumps(msg))
             self.ns.process()
@@ -477,6 +449,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             if self.loopCnt == 0:
                 self.loopCnt = 40
             self.loopCnt -= 1
+
         # 每隔5s发送一次心跳包
         if self.tickCnt == 0:
             self.tickCnt = 100
@@ -531,6 +504,24 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             self.scoreListWigdet.update()
             tmpcnt = 0
 
+    # 更新得分并显示
+    def updateScore(self):
+        if not self.userInfo.IsInRoom:
+            self.scoreStatus1.setText("0 " + _fromUtf8("分"))
+            self.scoreStatus2.setText("0 " + _fromUtf8("分"))
+        else:
+            if not self.userInfo.name in self.scoreList.keys():
+                self.scoreStatus1.setText("0 " + _fromUtf8("分"))
+            else:
+                self.scoreStatus1.setText(str(self.scoreList[self.userInfo.name]) + _fromUtf8("分"))
+            self.scoreStatus1.update()
+            # 更新对手得分
+            if  self.userInfo.opponent == None or ( not self.userInfo.opponent in self.scoreList.keys()):
+                self.scoreStatus2.setText("0 " + _fromUtf8("分"))
+            else:
+                self.scoreStatus2.setText(str(self.scoreList[self.userInfo.opponent]) + _fromUtf8("分"))
+            self.scoreStatus2.update()
+
     def GoingChess(self, data):
         self.infotext.setText(_fromUtf8("可以正式比赛了"))
         self.setButtonStatus(False, True, True, False, True, True)
@@ -548,15 +539,11 @@ class ChessGame(QMainWindow, Ui_MainWindow):
 
     def releaseAction(self, event):
         if event.button() == Qt.LeftButton:
-            # print event.pos().x()
-            # print event.pos().y()
             self.paint(event.pos().x(), event.pos().y())
 
     # 绘制棋子
     def paint(self, x, y):
         n, m = self.userInfo.leftMousePressEvent(x, y)
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("paint() n %s, m: %s " % (n, m))
         if n != -1:
             data = {'sid': 100, 'cid': 1006, 'm': m, 'n': n, 'userlist': [self.userInfo.opponent]}
             self.ns.send(json.dumps(data))
@@ -569,18 +556,9 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             self.ns.send(json.dumps(data))
         self.ns.process()
 
-    # # 开始比赛
-    # def beginGame(self):
-    #     self.infotext.setText(_fromUtf8('比赛开始了'))
-    #     self.setButtonStatus(False, True, True, False, True)
-    #     self.userInfo.IsReady = True
-    #     self.chessboard.mouseReleaseEvent = self.releaseAction
-
     # 发送广播信息
     def sendGroupMsgEvent(self):
         gtalkMsg = _toUtf8(self.groupChatEdit.text())
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("sendGroupMsgEvent() %s" % gtalkMsg)
         gtalkMsg = str(gtalkMsg).strip()
         data = {'sid': 106, 'cid': 1001, 'message': gtalkMsg, 'user': self.userInfo.name}
         self.ns.send(json.dumps(data))
@@ -589,8 +567,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     # 发送私聊信息
     def sendSingleMsgEvent(self):
         stalkMsg = _toUtf8(self.singleChatEdit.text())
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("sendGroupMsgEvent() %s" % stalkMsg)
         stalkMsg = str(stalkMsg).strip()
         if stalkMsg == '':
             return
@@ -600,7 +576,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         else:
             data = {'sid': 106, 'cid': 1003, 'message': stalkMsg,
                     'userlist': [self.userInfo.opponent, self.userInfo.name], 'user': self.userInfo.name}
-        logging.debug("sendGroupMsgEvent data userlist() %s" % data['userlist'])
+        # logging.debug("sendGroupMsgEvent data userlist() %s" % data['userlist'])
         self.ns.send(json.dumps(data))
         self.ns.process()
 

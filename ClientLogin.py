@@ -138,7 +138,7 @@ class Ui_Dialog(object):
         spacerItem7 = QtGui.QSpacerItem(43, 16, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem7)
         self.loginBt = QtGui.QPushButton(self.frame_4)
-        self.loginBt.setMinimumSize(QtCore.QSize(30, 30))
+        self.loginBt.setMinimumSize(QtCore.QSize(50, 30))
         self.loginBt.setObjectName(_fromUtf8("loginBt"))
         self.loginBt.setStyleSheet(
                 _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A;background:#CDC8B1"))
@@ -147,20 +147,21 @@ class Ui_Dialog(object):
         spacerItem8 = QtGui.QSpacerItem(43, 16, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem8)
         self.verticalLayout.addWidget(self.frame_4)
-
         self.verticalLayout_2.addWidget(self.widget)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(_translate("Dialog", "Login", None))
-
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/images/chesslogo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Dialog.setWindowIcon(icon)
+        Dialog.setWindowTitle(_translate("Dialog", "Chess Game Login Form", None))
         self.appName.setText(_translate("Dialog", "Chess Game", None))
         self.miniBt.setText(_translate("Dialog", "-", None))
         self.closeBt.setText(_translate("Dialog", "X", None))
         self.label.setText(_translate("Dialog", "昵称：", None))
         self.ip.setText(_translate("Dialog", "IP地址:", None))
         self.portname.setText(_translate("Dialog", "端口：", None))
-        self.loginBt.setText(_translate("Dialog", "登 录", None))
+        self.loginBt.setText(_translate("Dialog", "登录", None))
 

@@ -85,6 +85,9 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.timer.start(50)
 
     def setUiStyleSheet(self):
+        icon = QIcon()
+        icon.addPixmap(QPixmap(_fromUtf8(":/images/chesslogo.png")), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
         self.appName.setStyleSheet(
             _fromUtf8("font-family: Papyrus; font-size: 18px; font-weight: bold; color: #FF6A6A"))
         self.textEdit_3.setStyleSheet(_fromUtf8("font-family: 宋体; font-size: 12px; color: #8B2500"))

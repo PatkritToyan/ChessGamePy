@@ -215,9 +215,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             else:
                 QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("您已进入房间，等待您的对手进入房间！"))
                 print "inRoom" + self.username
-                # print type(self.username)
-                # logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                # logging.debug("inToTable() roomid: %s,tableid: %s" % (numOfRoom, numOfTable))
                 data = {'sid': 100, 'cid': 1002, 'roomid': numOfRoom, 'tableid': numOfTable, 'user': self.username}
                 self.ns.send(json.dumps(data))
                 self.ns.process()
@@ -270,14 +267,14 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     elif data['cid'] == 1005:
                         if data['message'] == u'begin':
                             # 开始比赛
-                            if data['white'] == self.userInfo.name:
+                            if data['white'] == self.userInfo.name.decode('utf-8'):
                                 self.blackChess.setCheckable(False)
                                 self.whiteChess.setCheckable(True)
                                 self.blackChess.setChecked(False)
                                 self.whiteChess.setChecked(True)
                                 self.blackChess.update()
                                 self.whiteChess.update()
-                            elif data['white'] == self.userInfo.opponent:
+                            else:
                                 self.blackChess.setCheckable(True)
                                 self.whiteChess.setCheckable(False)
                                 self.blackChess.setChecked(True)
@@ -528,7 +525,9 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.userInfo.IsBegin = True
         self.chessboard.mouseReleaseEvent = self.releaseAction
         # 如果白棋是自己的名字 那么自己的五子棋类型是白棋
-        if data['white'] == self.userInfo.name:
+        print self.userInfo.name
+        print type(self.userInfo.name)
+        if data['white'] == self.userInfo.name.decode('utf-8'):
             self.infotext.setText(_fromUtf8('你是白棋，你后手'))
             self.userInfo.chessType = self.userInfo.WHITE_CHESS
             self.userInfo.IsNext = False

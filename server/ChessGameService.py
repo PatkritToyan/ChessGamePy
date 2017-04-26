@@ -8,7 +8,9 @@ class ChessGameService(object):
     def __init__(self):
         commands = {
             1001: self.playAgainRequest,
-            1002: self.playAgainResponse
+            1002: self.playAgainResponse,
+            1003: self.peaceRequest,
+            1004: self.peaceResponse
         }
         self.registers(commands)
 
@@ -35,5 +37,15 @@ class ChessGameService(object):
 
     # 再来一局回应
     def playAgainResponse(self, msg):
+        msg['sendType'] = 3
+        return msg
+
+    # 请求和棋
+    def peaceRequest(self, msg):
+        msg['sendType'] = 3
+        return msg
+
+    # 和棋回应
+    def peaceResponse(self, msg):
         msg['sendType'] = 3
         return msg

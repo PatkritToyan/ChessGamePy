@@ -26,7 +26,8 @@ class TableShowService(object):
             1006: self.updateChess,
             1007: self.getWinner,
             1008: self.giveUp,
-            1009: self.getScoreList
+            1009: self.getScoreList,
+            1010: self.peaceRes
         }
         self.registers(commands)
 
@@ -125,6 +126,13 @@ class TableShowService(object):
         loser = msg['loser']
         self.scoreList[loser] += 1
         msg['userlist'] = [msg['winner']]
+        msg['sendType'] = 3
+        return msg
+
+    # 和棋 双方加分2分
+    def peaceRes(self, msg):
+        for user in msg['userlist']:
+            self.scoreList[user] += 2
         msg['sendType'] = 3
         return msg
 

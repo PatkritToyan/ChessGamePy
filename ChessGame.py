@@ -131,7 +131,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
 
     # 认输
     def giveUpChess(self):
-        self.setButtonStatus(False, False, False, False, True, True)
+        self.setButtonStatus(False, False, False, True, True, True)
         self.userInfo.IsNext = False
         msg = {'sid': 100, 'cid': 1008, 'winner': self.userInfo.opponent, 'loser': self.userInfo.name,
                'chessType': self.userInfo.chessType}
@@ -332,7 +332,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         self.ns.process()
                     elif data['cid'] == 1008:
                         self.infotext.setText(_fromUtf8("对方认输，你赢了"))
-                        self.setButtonStatus(False, False, False, False, True, True)
+                        self.setButtonStatus(False, False, False, True, True, True)
                         self.userInfo.IsNext = False
                         msg = {'sid': 100, 'cid': 1009}
                         self.ns.send(json.dumps(msg))

@@ -7,6 +7,7 @@ from TableShowService import *
 from ChessGameService import *
 from ChatService import *
 from TickService import *
+import ConfigParser, os, codecs
 
 
 class Server_Launcher(object):
@@ -16,8 +17,9 @@ class Server_Launcher(object):
         self.host.startup(9999)
         print('service startup at port', self.host.port)
         self.host.settimer(2000)
-        self.userList = {}  # 历史所有人
-        self.onlineUserlist = {}
+        confile = "playerconfig.ini"
+        self.userList = {}  # 历史 所有用户列表
+        self.onlineUserlist = {}    # 在线 用户列表
 
 
 if __name__ == '__main__':
@@ -42,18 +44,19 @@ if __name__ == '__main__':
             data = json.loads(data)
             logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
             logging.debug("Server_Launcher() NET_DATA data: %s, wparam:%s" % (data, wparam))
-            # 第一次登录进来 记录用户人
+            # 用户登录校验 如果在线用户列表里不存在该用户 则可登录 若存在 则提示用户更换昵称登录
             if data['sid'] == 103:
-                server.userList[data['user']] = wparam
-                server.onlineUserlist[data['user']] = wparam
+                if server.userList and data['user'] in server.userList.keys() and server.onlineUserlist and data['user'] in server.onlineUserlist.keys():
+                    msg = {'sid': 120, 'reply': 'error'}
+                else:
+                    msg = {'sid': 120, 'reply': 'success'}
+                    server.userList[data['user']] = wparam
+                    server.onlineUserlist[data['user']] = wparam
+                server.host.send(wparam, json.dumps(msg))
             elif data['sid'] == 110:  # 用户离线，移除在线名单
                 server.onlineUserlist.pop(data['user'])
             else:
                 result = dispatch.dispatch(data)
-                # logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                # logging.debug("Server_Launcher() result: %s " % result)
-                # logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                # logging.debug("Server_Launcher() userList: %s " % server.userList)
                 # 将服务端处理完的数据返回给发送者
                 if result['sendType'] == 1:
                     server.host.send(wparam, json.dumps(result))
@@ -67,24 +70,24 @@ if __name__ == '__main__':
                         for user in result['userlist']:
                             server.host.send(server.userList[user], json.dumps(result))
                 server.host.process()
-            logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-            logging.debug(
-                "Server_Launcher() NET_DATA userList: %s, onlineUserlist:%s" % (server.userList, server.onlineUserlist))
+                logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                logging.debug(
+                    "Server_Launcher() NET_DATA userList: %s, onlineUserlist:%s" % (server.userList, server.onlineUserlist))
             if data == 'exit':
                 print 'client request to exit'
                 server.host.close()
         # 处理玩家进入
         elif event == NET_NEW:
             print wparam, 'is in'
-            # sid == 101表示登录成功
-            data = {'sid': 101, 'type': 'HELLO CLIENT %X' % wparam, 'onlineUser': server.onlineUserlist}
+            # sid == 101表示连接成功 给用户发送连接成功消息
+            data = {'sid': 101, 'type': 'HELLO CLIENT %X' % wparam}
             server.host.send(wparam, json.dumps(data))
             server.host.settag(wparam, wparam)
             server.host.nodelay(wparam, 1)
         # 处理时钟
         elif event == NET_TIMER:
             logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-            logging.debug("Server_Launcher() NET_TIMER data: %s" % data)
+            logging.debug("Server() userlist: %s, onlineuserlist:%s" % (server.userList, server.onlineUserlist))
             # 发送桌子列表
             data = {'sid': 100, 'cid': 1001}
             result = dispatch.dispatch(data)
@@ -92,7 +95,5 @@ if __name__ == '__main__':
                 server.host.send(server.userList[user], json.dumps(result))
         # 处理玩家离开
         elif event == NET_LEAVE:
-            logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-            logging.debug("Server_Launcher() NET_TIMER wparam: %s" % wparam)
             print wparam, 'is out'
             server.host.close(wparam)

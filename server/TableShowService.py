@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-import logging
+import logging, os, ConfigParser, codecs, json
 
 
 class TableShowService(object):
@@ -14,7 +14,14 @@ class TableShowService(object):
         # 显示每个用户当前的状态
         self.state = {}
         # 每个用户的得分列表
-        self.scoreList = {}
+        confile = "playerconfig.ini"
+        if os.access(confile, os.F_OK) and os.access(confile, os.R_OK):
+            self.importIni(confile)
+        else:
+            print 'no'
+            self.scoreList = {}
+
+
         for i in range(100):
             self.userList.append([])
         commands = {
@@ -30,6 +37,24 @@ class TableShowService(object):
             1010: self.peaceRes
         }
         self.registers(commands)
+
+    def importIni(self, file):
+        try:
+            cf = ConfigParser.SafeConfigParser()
+            with codecs.open(file, 'r', encoding='utf-8') as f:
+                cf.readfp(f)
+            self.scoreList = json.loads(cf.get('Player', 'scorelist'))
+        except:
+            self.scoreList = {}
+            print 'Bad config file.'
+
+    def exportIni(self, file):
+        cf = ConfigParser.SafeConfigParser()
+        cf.add_section('Player')
+        cf.set('Player', 'scorelist', json.dumps(self.scoreList))
+        with codecs.open(file, 'w+', encoding='utf-8') as f:
+            cf.write(f)
+        f.close()
 
     def handle(self, msg):
         cid = msg['cid']
@@ -138,5 +163,6 @@ class TableShowService(object):
 
     # 获得分数列表
     def getScoreList(self, msg):
+        self.exportIni('./playerconfig.ini')
         data = {'sid': 100, 'cid': 1009, 'scorelist': self.scoreList, 'sendType': 2}
         return data

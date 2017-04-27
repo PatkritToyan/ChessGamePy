@@ -74,7 +74,7 @@ class ClientLogin_launcher(QWidget, Ui_Dialog):
         self.client.show()
 
     def loginError(self):
-        QMessageBox.information(self, _fromUtf8("登录失败!"))
+        QMessageBox.information(self, _fromUtf8('提示'),_fromUtf8("登录失败!"))
 
     # 连接服务器
     def serverConnection(self):
@@ -83,11 +83,18 @@ class ClientLogin_launcher(QWidget, Ui_Dialog):
             data = self.ns.recv()
             logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
             logging.debug(" serverConnection data() x: %s" % data)
+            print 'serverconnection'
             if len(data) > 0:
                 # 约定协议为json格式
                 data = json.loads(data)
                 if data['sid'] == 101:
-                    if self.username in data['onlineUser'].keys():
+                    print '101'
+                    message = {'sid': 103, 'user': self.username}
+                    self.ns.send(json.dumps(message))
+                    self.ns.process()
+                elif data['sid'] == 120:
+                    print '120'
+                    if data['reply'] == 'error':
                         QMessageBox.information(self, _fromUtf8('提示'), _fromUtf8("用户名冲突，请更换用户名！"))
                     else:
                         print 'login success'

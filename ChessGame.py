@@ -397,12 +397,12 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.rank()
         # 更新得分
         self.updateScore()
-        # 第一次进来，配对用户名和hid
-        if self.FirstTime:
-            msg = {'sid': 103, 'cid': 1001, 'user': self.userInfo.name}
-            self.ns.send(json.dumps(msg))
-            self.ns.process()
-            self.FirstTime = False
+        # # 第一次进来，配对用户名和hid
+        # if self.FirstTime:
+        #     msg = {'sid': 103, 'cid': 1001, 'user': self.userInfo.name}
+        #     self.ns.send(json.dumps(msg))
+        #     self.ns.process()
+        #     self.FirstTime = False
         # 检索对手
         if self.userInfo.opponent == None and self.loopCnt == 0:
             self.loopCnt = 40

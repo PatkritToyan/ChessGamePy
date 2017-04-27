@@ -276,6 +276,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     elif data['cid'] == 1006:
                         n = data['n']
                         m = data['m']
+                        self.userInfo.chessCnt = data['chesscnt']
                         self.userInfo.updateChessBoard(n, m)
                     elif data['cid'] == 1007:
                         self.infotext.setText(_fromUtf8("很遗憾，你输了"))
@@ -293,12 +294,11 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         self.ns.process()
                     elif data['cid'] == 1009:
                         self.scoreList = data['scorelist']
-                        logging.basicConfig(level=logging.DEBUG,
-                                            format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                        logging.debug("check() ScoreList: %s " % self.scoreList)
                     elif data['cid'] == 1010:
                         self.infotext.setText(_fromUtf8("和棋！"))
                         self.setButtonStatus(False, False, False, True, True, True)
+                        self.userInfo.IsNext = False
+                        self.userInfo.chessCnt = 0
                         msg = {'sid': 100, 'cid': 1009}
                         self.ns.send(json.dumps(msg))
                         self.ns.process()
@@ -336,6 +336,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         replay = QMessageBox.question(self, _fromUtf8("和棋"), _fromUtf8("你的对手请求和棋，是否同意？"),
                                                       QMessageBox.Yes, QMessageBox.No)
                         if replay == QMessageBox.Yes:
+                            self.userInfo.IsNext = False
                             data = {'sid': 104, 'cid': 1004, 'replay': 'yes', 'userlist': [self.userInfo.opponent]}
                             self.ns.send(json.dumps(data))
                             self.ns.process()
@@ -345,6 +346,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             self.ns.process()
                     elif data['cid'] == 1004:
                         if data['replay'] == 'yes':
+                            self.userInfo.IsNext = False
                             QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("对手同意和棋"))
                             data = {'sid': 100, 'cid': 1010, 'userlist': [self.userInfo.opponent, self.userInfo.name]}
                             self.ns.send(json.dumps(data))
@@ -517,18 +519,25 @@ class ChessGame(QMainWindow, Ui_MainWindow):
 
     # 绘制棋子
     def paint(self, x, y):
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("paint() before,userInfo.name: %s, chessType: %s" % (self.userInfo.name, self.userInfo.chessType))
         n, m = self.userInfo.leftMousePressEvent(x, y)
         if n != -1:
-            data = {'sid': 100, 'cid': 1006, 'm': m, 'n': n, 'userlist': [self.userInfo.opponent]}
+            data = {'sid': 100, 'cid': 1006, 'm': m, 'n': n, 'userlist': [self.userInfo.opponent], 'chesscnt': self.userInfo.chessCnt}
             self.ns.send(json.dumps(data))
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+        logging.debug("paint() userInfo.name: %s, chessCnt: %s" % (self.userInfo.name, self.userInfo.chessCnt))
         if self.userInfo.IsWhoWin(n, m):
             self.userInfo.IsNext = False
             self.setButtonStatus(False, False, False, False, True, True)
             self.infotext.setText(_fromUtf8('恭喜你赢了'))
             data = {'sid': 100, 'cid': 1007, 'winner': self.userInfo.name, 'loser': self.userInfo.opponent, 'chessType':
                 self.userInfo.chessType}
+            self.ns.send(json.dumps(data))
+        elif n != -1 and self.userInfo.chessCnt >= 225:
+            self.userInfo.IsNext = False
+            self.setButtonStatus(False, False, False, False, True, True)
+            self.infotext.setText(_fromUtf8('棋盘下满啦，和棋！'))
+            self.userInfo.chessCnt = 0
+            data = {'sid': 100, 'cid': 1010, 'userlist': [self.userInfo.opponent, self.userInfo.name]}
             self.ns.send(json.dumps(data))
         self.ns.process()
 

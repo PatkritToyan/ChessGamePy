@@ -374,7 +374,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         if data['user'] != self.userInfo.name.decode('utf-8'):
                             self.singleChatRoom.append(now_time + '\n' + self.userInfo.opponent + ":" + data['message'])
                         else:
-                            self.singleChatRoom.append(now_time + '\n' + self.userInfo.name + ":" + data['message'])
+                            self.singleChatRoom.append(now_time + '\n' + self.userInfo.name.decode('utf-8') + ":" + data['message'])
                         self.singleChatRoom.update()
                         self.singleChatEdit.clear()
                         self.singleChatEdit.update()
@@ -484,10 +484,10 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             self.scoreStatus1.setText("0 " + _fromUtf8("分"))
             self.scoreStatus2.setText("0 " + _fromUtf8("分"))
         else:
-            if not self.userInfo.name in self.scoreList.keys():
+            if not self.userInfo.name.decode('utf-8') in self.scoreList.keys():
                 self.scoreStatus1.setText("0 " + _fromUtf8("分"))
             else:
-                self.scoreStatus1.setText(str(self.scoreList[self.userInfo.name]) + _fromUtf8("分"))
+                self.scoreStatus1.setText(str(self.scoreList[self.userInfo.name.decode('utf-8')]) + _fromUtf8("分"))
             self.scoreStatus1.update()
             # 更新对手得分
             if  self.userInfo.opponent == None or ( not self.userInfo.opponent in self.scoreList.keys()):

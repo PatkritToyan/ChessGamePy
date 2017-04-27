@@ -162,6 +162,8 @@ class Ui_Dialog(object):
         self.closeBt.setText(_translate("Dialog", "X", None))
         self.label.setText(_translate("Dialog", "昵称：", None))
         self.ip.setText(_translate("Dialog", "IP地址:", None))
+        self.ip_val.setText(_translate("Dialog", "127.0.0.1", None))
         self.portname.setText(_translate("Dialog", "端口：", None))
+        self.port_val.setText(_translate("Dialog", "9999", None))
         self.loginBt.setText(_translate("Dialog", "登录", None))
 

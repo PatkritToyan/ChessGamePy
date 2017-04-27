@@ -16,7 +16,8 @@ class Server_Launcher(object):
         self.host.startup(9999)
         print('service startup at port', self.host.port)
         self.host.settimer(2000)
-        self.userList = {}
+        self.userList = {}  # 历史所有人
+        self.onlineUserlist = {}
 
 
 if __name__ == '__main__':
@@ -44,12 +45,15 @@ if __name__ == '__main__':
             # 第一次登录进来 记录用户人
             if data['sid'] == 103:
                 server.userList[data['user']] = wparam
+                server.onlineUserlist[data['user']] = wparam
+            elif data['sid'] == 110:  # 用户离线，移除在线名单
+                server.onlineUserlist.pop(data['user'])
             else:
                 result = dispatch.dispatch(data)
-                logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                logging.debug("Server_Launcher() result: %s " % result)
-                logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-                logging.debug("Server_Launcher() userList: %s " % server.userList)
+                # logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                # logging.debug("Server_Launcher() result: %s " % result)
+                # logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                # logging.debug("Server_Launcher() userList: %s " % server.userList)
                 # 将服务端处理完的数据返回给发送者
                 if result['sendType'] == 1:
                     server.host.send(wparam, json.dumps(result))
@@ -63,16 +67,17 @@ if __name__ == '__main__':
                         for user in result['userlist']:
                             server.host.send(server.userList[user], json.dumps(result))
                 server.host.process()
+            logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+            logging.debug(
+                "Server_Launcher() NET_DATA userList: %s, onlineUserlist:%s" % (server.userList, server.onlineUserlist))
             if data == 'exit':
                 print 'client request to exit'
                 server.host.close()
         # 处理玩家进入
         elif event == NET_NEW:
-            logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-            logging.debug("Server_Launcher() NET_NEW data: %s, wparam:%s" % (data, wparam))
             print wparam, 'is in'
             # sid == 101表示登录成功
-            data = {'sid': 101, 'type': 'HELLO CLIENT %X' % wparam}
+            data = {'sid': 101, 'type': 'HELLO CLIENT %X' % wparam, 'onlineUser': server.onlineUserlist}
             server.host.send(wparam, json.dumps(data))
             server.host.settag(wparam, wparam)
             server.host.nodelay(wparam, 1)

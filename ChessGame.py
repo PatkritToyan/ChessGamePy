@@ -71,7 +71,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.connect(self.peaceBt, SIGNAL("clicked()"), self.peaceChess)
         self.connect(self.againBt, SIGNAL("clicked()"), self.againChess)
         self.connect(self.leaveOutBt, SIGNAL("clicked()"), self.leaveOutChess)
-        self.connect(self.closeBt, SIGNAL("clicked()"), self.hide)
+        self.connect(self.closeBt, SIGNAL("clicked()"), self.outofServer)
         self.connect(self.miniBt, SIGNAL("clicked()"), self.showMinimized)
         self.connect(self.sendGroupMsg, SIGNAL("clicked()"), self.sendGroupMsgEvent)
         self.connect(self.sendSingleMsg, SIGNAL("clicked()"), self.sendSingleMsgEvent)
@@ -79,6 +79,11 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         # 触发定时器
         self.connect(self.timer, SIGNAL("timeout()"), self.check)
 
+    #退出客户端
+    def outofServer(self):
+        data = {'sid': 110, 'user': self.userInfo.name}
+        self.ns.send(json.dumps(data))
+        self.close()
     # 连接服务器
     def connectToServer(self):
         self.__init__config()

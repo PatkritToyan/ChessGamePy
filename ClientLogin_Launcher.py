@@ -87,8 +87,11 @@ class ClientLogin_launcher(QWidget, Ui_Dialog):
                 # 约定协议为json格式
                 data = json.loads(data)
                 if data['sid'] == 101:
-                    print 'login success'
-                    self.loginSuccess()
+                    if self.username in data['onlineUser'].keys():
+                        QMessageBox.information(self, _fromUtf8('提示'), _fromUtf8("用户名冲突，请更换用户名！"))
+                    else:
+                        print 'login success'
+                        self.loginSuccess()
                 else:
                     self.loginError()
 

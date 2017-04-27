@@ -112,9 +112,9 @@ class TableShowService(object):
         logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
         logging.debug("SERVER getWinner() scoreList:%s" % self.scoreList)
         winner = msg['winner']
-        self.scoreList[winner] += 6
+        self.scoreList[winner] += 3
         loser = msg['loser']
-        self.scoreList[loser] += 1
+        self.scoreList[loser] -= 1
         msg['userlist'] = [msg['loser']]
         msg['sendType'] = 3
         return msg
@@ -122,9 +122,9 @@ class TableShowService(object):
     # 某方认输
     def giveUp(self, msg):
         winner = msg['winner']
-        self.scoreList[winner] += 6
+        self.scoreList[winner] += 3
         loser = msg['loser']
-        self.scoreList[loser] += 1
+        self.scoreList[loser] -= 1
         msg['userlist'] = [msg['winner']]
         msg['sendType'] = 3
         return msg
@@ -132,7 +132,7 @@ class TableShowService(object):
     # 和棋 双方加分2分
     def peaceRes(self, msg):
         for user in msg['userlist']:
-            self.scoreList[user] += 2
+            self.scoreList[user] += 0
         msg['sendType'] = 3
         return msg
 

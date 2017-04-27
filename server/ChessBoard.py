@@ -12,16 +12,16 @@ except AttributeError:
     def _fromUtf8(s):
         return s
 
-
+# 0代表没有棋子 1代表黑棋 2代表白棋
+NO_CHESS = 0
+BLACK_CHESS = 1
+WHITE_CHESS = 2
 
 
 class ChessBoard(object):
 
     def __init__(self, username, chessboard, infotext):
-        # 0代表没有棋子 1代表黑棋 2代表白棋
-        self.NO_CHESS = 0
-        self.BLACK_CHESS = 1
-        self.WHITE_CHESS = 2
+
         self.IsInRoom = False   # 是否在房间里
         self.IsReady = False    # 是否准备好
         self.IsBegin = False    # 是否开始了
@@ -31,15 +31,16 @@ class ChessBoard(object):
         self.tableId = -1
         self.opponent = None
         self.IsNext = False
-        self.chessType = self.NO_CHESS
+        self.chessType = NO_CHESS
         self.chessboard = chessboard
         self.name = username
         self.infotext = infotext
         self.gridWidth = 32
         self.limit = 5
-        self.chessArray = [[(0, 0, self.NO_CHESS)] * 15 for i in range(0, 15)]
-        self.chessStatus = [[(0, 0, self.NO_CHESS)] * 15 for i in range(0, 15)]
+        self.chessArray = [[(0, 0, NO_CHESS)] * 15 for i in range(0, 15)]
+        self.chessStatus = [[(0, 0, NO_CHESS)] * 15 for i in range(0, 15)]
         self.path = []
+        self.chessCnt = 0  # 判断棋子是否放满棋盘 如果放满 则自动判定为和棋
 
     # 计算棋子放置的坐标 根据鼠标位置确定绘制的是哪一个格子
     def chessLos(self, xLos, yLos):
@@ -63,24 +64,23 @@ class ChessBoard(object):
             return -1, -1
 
         self.n, self.m, self.x, self.y = self.chessLos(curX, curY)
-
         # 如果棋盘上有棋，就不能下
-        if self.chessStatus[self.n][self.m][2] != self.NO_CHESS:
+        if self.chessStatus[self.n][self.m][2] != NO_CHESS:
             return -1, -1
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("leftMousePressEvent() n: %s, m: %s " % (self.n, self.m))
+
         # 绘制棋子
         self.chessStatus[self.n][self.m] = (self.x, self.y, self.chessType)
         self.path.append([self.n, self.m])
         self.chessArray[self.n][self.m] = QGraphicsView(self.chessboard)
         self.chessArray[self.n][self.m].setGeometry(QRect(32 * self.n, 32 * self.m, 32, 32))
-        if self.chessType == self.BLACK_CHESS:
+        if self.chessType == BLACK_CHESS:
             self.chessArray[self.n][self.m].setStyleSheet(_fromUtf8("background-image:url(:images/blackchess.png)"))
-        elif self.chessType == self.WHITE_CHESS:
+        elif self.chessType == WHITE_CHESS:
             self.chessArray[self.n][self.m].setStyleSheet(_fromUtf8("background-image:url(:images/whitechess.png)"))
         self.chessArray[self.n][self.m].setFrameShape(QFrame.NoFrame)
         self.chessArray[self.n][self.m].show()
         self.IsNext = False
+        self.chessCnt += 1
         self.infotext.setText("我下完了，到您了".decode('utf-8'))
         self.chessboard.update()
         return self.n, self.m
@@ -100,26 +100,24 @@ class ChessBoard(object):
                 self.chessArray[n][m] = None
             self.chessboard.update()
         # 重新初始化数据
-        self.chessArray = [[(0, 0, self.NO_CHESS)] * 15 for i in range(15)]
-        self.chessStatus = [[(0, 0, self.NO_CHESS)] * 15 for i in range(15)]
+        self.chessArray = [[(0, 0, NO_CHESS)] * 15 for i in range(15)]
+        self.chessStatus = [[(0, 0, NO_CHESS)] * 15 for i in range(15)]
+        self.chessCnt = 0
         self.path = []
 
     # 更新棋盘
     def updateChessBoard(self, n, m):
-        oppo = self.WHITE_CHESS
-        if self.chessType == self.WHITE_CHESS:
-            oppo = self.BLACK_CHESS
-
+        oppo = WHITE_CHESS
+        if self.chessType == WHITE_CHESS:
+            oppo = BLACK_CHESS
         x = float(n * self.gridWidth + self.limit)
         y = float(m * self.gridWidth + self.limit)
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("updateChessBoard() x: %s, y: %s " %  (x , y))
         # 绘制当前棋子
-        self.chessArray[n][m] = (x, y, oppo)
+        self.chessStatus[n][m] = (x, y, oppo)
         self.path.append([n, m])
         self.chessArray[n][m] = QGraphicsView(self.chessboard)
         self.chessArray[n][m].setGeometry(QRect(32 * n, 32 * m, 32, 32))
-        if oppo == self.BLACK_CHESS:
+        if oppo == BLACK_CHESS:
             self.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/blackchess.png);"))
         else:
             self.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/whitechess.png);"))

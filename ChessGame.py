@@ -277,20 +277,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         n = data['n']
                         m = data['m']
                         self.userInfo.updateChessBoard(n, m)
-                        if self.userInfo.chessType == self.userInfo.WHITE_CHESS:
-                            self.blackChess.setCheckable(False)
-                            self.whiteChess.setCheckable(True)
-                            self.blackChess.setChecked(False)
-                            self.whiteChess.setChecked(True)
-                            self.blackChess.update()
-                            self.whiteChess.update()
-                        elif self.userInfo.chessType == self.userInfo.BLACK_CHESS:
-                            self.blackChess.setCheckable(True)
-                            self.whiteChess.setCheckable(False)
-                            self.blackChess.setChecked(True)
-                            self.whiteChess.setChecked(False)
-                            self.blackChess.update()
-                            self.whiteChess.update()
                     elif data['cid'] == 1007:
                         self.infotext.setText(_fromUtf8("很遗憾，你输了"))
                         self.setButtonStatus(False, False, False, True, True, True)
@@ -502,15 +488,10 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.userInfo.IsBegin = True
         self.chessboard.mouseReleaseEvent = self.releaseAction
         # 如果白棋是自己的名字 那么自己的五子棋类型是白棋
-        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-        logging.debug("GoingChess() data: %s, userInfo.name: %s" % (data, self.userInfo.name))
-        # print self.userInfo.name.decode('utf-8')
-        # print data['white']==self.userInfo.name
-        # print type(self.userInfo.name.decode('utf-8'))
-        # print type(data['white'])
+
         if data['white'] == self.userInfo.name.decode('utf-8'):
             self.infotext.setText(_fromUtf8('你是白棋，你后手'))
-            self.userInfo.chessType = self.userInfo.WHITE_CHESS
+            self.userInfo.chessType = WHITE_CHESS
             self.userInfo.IsNext = False
             self.blackChess.setCheckable(False)
             self.whiteChess.setCheckable(True)
@@ -521,7 +502,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
             self.whiteChess.update()
         else:
             self.infotext.setText(_fromUtf8('你是黑棋，你先手'))
-            self.userInfo.chessType = self.userInfo.BLACK_CHESS
+            self.userInfo.chessType = BLACK_CHESS
             self.userInfo.IsNext = True
             self.blackChess.setCheckable(True)
             self.whiteChess.setCheckable(False)
@@ -536,6 +517,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
 
     # 绘制棋子
     def paint(self, x, y):
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+        logging.debug("paint() before,userInfo.name: %s, chessType: %s" % (self.userInfo.name, self.userInfo.chessType))
         n, m = self.userInfo.leftMousePressEvent(x, y)
         if n != -1:
             data = {'sid': 100, 'cid': 1006, 'm': m, 'n': n, 'userlist': [self.userInfo.opponent]}

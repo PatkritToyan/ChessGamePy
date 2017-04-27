@@ -266,21 +266,10 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             self.scoreStatus2.update()
                     elif data['cid'] == 1005:
                         if data['message'] == u'begin':
+                            logging.basicConfig(level=logging.DEBUG,
+                                                format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+                            logging.debug("check() SetState userInfo.name:%s,data:%s " % (self.userInfo.name, data))
                             # 开始比赛
-                            if data['white'] == self.userInfo.name.decode('utf-8'):
-                                self.blackChess.setCheckable(False)
-                                self.whiteChess.setCheckable(True)
-                                self.blackChess.setChecked(False)
-                                self.whiteChess.setChecked(True)
-                                self.blackChess.update()
-                                self.whiteChess.update()
-                            else:
-                                self.blackChess.setCheckable(True)
-                                self.whiteChess.setCheckable(False)
-                                self.blackChess.setChecked(True)
-                                self.whiteChess.setChecked(False)
-                                self.blackChess.update()
-                                self.whiteChess.update()
                             self.GoingChess(data)
                         else:
                             self.infotext.setText(_fromUtf8('还有一方未准备!'))
@@ -337,17 +326,11 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                                                       QMessageBox.Yes, QMessageBox.No)
                         if replay == QMessageBox.Yes:
                             data = {'sid': 104, 'cid': 1002, 'replay': 'yes', 'userlist': [self.userInfo.opponent],
-                                    'white': self.userInfo.name}
+                                    'white': self.userInfo.name.decode('utf-8')}
                             self.ns.send(json.dumps(data))
                             self.ns.process()
                             # 清除棋盘
-                            self.blackChess.setCheckable(False)
-                            self.whiteChess.setCheckable(True)
                             self.userInfo.clearChessBoard()
-                            self.blackChess.setChecked(False)
-                            self.whiteChess.setChecked(True)
-                            self.blackChess.update()
-                            self.whiteChess.update()
                             # 正式开始比赛
                             self.GoingChess(data)
                         else:
@@ -359,12 +342,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                             QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("对手同意再来一局"))
                             # 清除棋盘
                             self.userInfo.clearChessBoard()
-                            self.blackChess.setCheckable(True)
-                            self.whiteChess.setCheckable(False)
-                            self.blackChess.setChecked(True)
-                            self.whiteChess.setChecked(False)
-                            self.blackChess.update()
-                            self.whiteChess.update()
                             # 正式开始比赛
                             self.GoingChess(data)
                         else:
@@ -394,7 +371,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                     now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                     QDateTime.fromString(now_time, 'yyyy-MM-dd hh:mm:ss')
                     if data['cid'] == 1003:
-                        if data['user'] != self.userInfo.name:
+                        if data['user'] != self.userInfo.name.decode('utf-8'):
                             self.singleChatRoom.append(now_time + '\n' + self.userInfo.opponent + ":" + data['message'])
                         else:
                             self.singleChatRoom.append(now_time + '\n' + self.userInfo.name + ":" + data['message'])
@@ -402,7 +379,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         self.singleChatEdit.clear()
                         self.singleChatEdit.update()
                     elif data['cid'] == 1001:
-                        if data['user'] != self.userInfo.name:
+                        if data['user'] != self.userInfo.name.decode('utf-8'):
                             self.groupChatRoom.append(now_time + '\n' + data['user'] + ":" + data['message'])
                         else:
                             self.groupChatRoom.append(now_time + '\n' + data['user'] + ":" + data['message'])
@@ -525,16 +502,33 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.userInfo.IsBegin = True
         self.chessboard.mouseReleaseEvent = self.releaseAction
         # 如果白棋是自己的名字 那么自己的五子棋类型是白棋
-        print self.userInfo.name
-        print type(self.userInfo.name)
+        logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
+        logging.debug("GoingChess() data: %s, userInfo.name: %s" % (data, self.userInfo.name))
+        # print self.userInfo.name.decode('utf-8')
+        # print data['white']==self.userInfo.name
+        # print type(self.userInfo.name.decode('utf-8'))
+        # print type(data['white'])
         if data['white'] == self.userInfo.name.decode('utf-8'):
             self.infotext.setText(_fromUtf8('你是白棋，你后手'))
             self.userInfo.chessType = self.userInfo.WHITE_CHESS
             self.userInfo.IsNext = False
+            self.blackChess.setCheckable(False)
+            self.whiteChess.setCheckable(True)
+            self.userInfo.clearChessBoard()
+            self.blackChess.setChecked(False)
+            self.whiteChess.setChecked(True)
+            self.blackChess.update()
+            self.whiteChess.update()
         else:
             self.infotext.setText(_fromUtf8('你是黑棋，你先手'))
             self.userInfo.chessType = self.userInfo.BLACK_CHESS
             self.userInfo.IsNext = True
+            self.blackChess.setCheckable(True)
+            self.whiteChess.setCheckable(False)
+            self.blackChess.setChecked(True)
+            self.whiteChess.setChecked(False)
+            self.blackChess.update()
+            self.whiteChess.update()
 
     def releaseAction(self, event):
         if event.button() == Qt.LeftButton:

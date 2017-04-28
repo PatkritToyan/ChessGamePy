@@ -37,8 +37,6 @@ class ClientLogin_launcher(QWidget, Ui_Dialog):
             Supports IPv4 and IPv6. 
             """
         if not ip or '\x00' in ip:
-            # getaddrinfo resolves empty strings to localhost, and truncates
-            # on zero bytes.
             return False
         try:
             res = socket.getaddrinfo(ip, 0, socket.AF_UNSPEC,

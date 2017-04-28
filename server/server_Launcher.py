@@ -21,8 +21,7 @@ class Server_Launcher(object):
         if os.access(self.confile, os.F_OK) and os.access(self.confile, os.R_OK):
             self.importIni(self.confile)
         else:
-            self.userList = {}
-        # self.userList = {}  # 历史 所有用户列表
+            self.userList = {}  # 历史 所有用户列表
         self.onlineUserlist = {}    # 在线 用户列表
 
     def importIni(self, file):
@@ -75,7 +74,7 @@ if __name__ == '__main__':
                     server.exportIni(server.confile)
                     server.onlineUserlist[data['user']] = wparam
                 server.host.send(wparam, json.dumps(msg))
-            elif data['sid'] == 110:  # 用户离线，移除在线名单
+            elif data['sid'] == 110:  # 用户离开事件，移除在线名单
                 server.onlineUserlist.pop(data['user'])
             else:
                 result = dispatch.dispatch(data)
@@ -115,7 +114,7 @@ if __name__ == '__main__':
             result = dispatch.dispatch(data)
             for user in server.userList.keys():
                 server.host.send(server.userList[user], json.dumps(result))
-        # 处理玩家离开
+        # 处理玩家离开 此时如果玩家还在房间 客户端会给服务器发送一条信息 告知对手 我已经离开房间了 处理逻辑在客户端点击X按钮
         elif event == NET_LEAVE:
             print wparam, 'is out'
             server.host.close(wparam)

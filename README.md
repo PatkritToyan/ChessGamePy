@@ -16,7 +16,7 @@
 ####TODO:
 * 实现竞手.
 * 实现悔棋
-* 实现数据存储
+* 实现数据存储（仅存储历史用户列表和得分记录）
 
 ####How To Running:
 * 先启动 server/server_Launcher.py

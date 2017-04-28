@@ -1,16 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import locale
-import sys
 import math, sip, logging
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
 
-try:
-    _fromUtf8 = QString.fromUtf8
-except AttributeError:
-    def _fromUtf8(s):
-        return s
 
 # 0代表没有棋子 1代表黑棋 2代表白棋
 NO_CHESS = 0
@@ -67,22 +58,8 @@ class ChessBoard(object):
         # 如果棋盘上有棋，就不能下
         if self.chessStatus[self.n][self.m][2] != NO_CHESS:
             return -1, -1
-
-        # 绘制棋子
-        self.chessStatus[self.n][self.m] = (self.x, self.y, self.chessType)
-        self.path.append([self.n, self.m])
-        self.chessArray[self.n][self.m] = QGraphicsView(self.chessboard)
-        self.chessArray[self.n][self.m].setGeometry(QRect(32 * self.n, 32 * self.m, 32, 32))
-        if self.chessType == BLACK_CHESS:
-            self.chessArray[self.n][self.m].setStyleSheet(_fromUtf8("background-image:url(:images/blackchess.png)"))
-        elif self.chessType == WHITE_CHESS:
-            self.chessArray[self.n][self.m].setStyleSheet(_fromUtf8("background-image:url(:images/whitechess.png)"))
-        self.chessArray[self.n][self.m].setFrameShape(QFrame.NoFrame)
-        self.chessArray[self.n][self.m].show()
         self.IsNext = False
         self.chessCnt += 1
-        self.infotext.setText("我下完了，到您了".decode('utf-8'))
-        self.chessboard.update()
         return self.n, self.m
 
     # 清楚棋盘数据
@@ -105,27 +82,6 @@ class ChessBoard(object):
         self.chessCnt = 0
         self.path = []
 
-    # 更新棋盘
-    def updateChessBoard(self, n, m):
-        oppo = WHITE_CHESS
-        if self.chessType == WHITE_CHESS:
-            oppo = BLACK_CHESS
-        x = float(n * self.gridWidth + self.limit)
-        y = float(m * self.gridWidth + self.limit)
-        # 绘制当前棋子
-        self.chessStatus[n][m] = (x, y, oppo)
-        self.path.append([n, m])
-        self.chessArray[n][m] = QGraphicsView(self.chessboard)
-        self.chessArray[n][m].setGeometry(QRect(32 * n, 32 * m, 32, 32))
-        if oppo == BLACK_CHESS:
-            self.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/blackchess.png);"))
-        else:
-            self.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/whitechess.png);"))
-        self.chessArray[n][m].setFrameShape(QFrame.NoFrame)
-        self.chessArray[n][m].show()
-        self.IsNext = True
-        self.infotext.setText(_fromUtf8("我方下"))
-        self.chessboard.update()
 
     # 判断当前输赢
     def IsWhoWin(self, x, y):

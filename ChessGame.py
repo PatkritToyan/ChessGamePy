@@ -249,7 +249,8 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         n = data['n']
                         m = data['m']
                         self.userInfo.chessCnt = data['chesscnt']
-                        self.userInfo.updateChessBoard(n, m)
+                        # self.userInfo.updateChessBoard(n, m)
+                        self.updateChessBoard(n, m)
                     elif data['cid'] == 1007:
                         self.infotext.setText(_fromUtf8("很遗憾，你输了"))
                         self.setButtonStatus(False, False, False, True, True, True)
@@ -449,6 +450,29 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                 self.scoreStatus2.setText(str(self.scoreList[self.userInfo.opponent]) + _fromUtf8("分"))
             self.scoreStatus2.update()
 
+
+    # 更新棋盘
+    def updateChessBoard(self, n, m):
+        oppo = WHITE_CHESS
+        if self.userInfo.chessType == WHITE_CHESS:
+            oppo = BLACK_CHESS
+        x = float(n * self.userInfo.gridWidth + self.userInfo.limit)
+        y = float(m * self.userInfo.gridWidth + self.userInfo.limit)
+        # 绘制当前棋子
+        self.userInfo.chessStatus[n][m] = (x, y, oppo)
+        self.userInfo.path.append([n, m])
+        self.userInfo.chessArray[n][m] = QGraphicsView(self.userInfo.chessboard)
+        self.userInfo.chessArray[n][m].setGeometry(QRect(32 * n, 32 * m, 32, 32))
+        if oppo == BLACK_CHESS:
+            self.userInfo.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/blackchess.png);"))
+        else:
+            self.userInfo.chessArray[n][m].setStyleSheet(_fromUtf8("background-image: url(:images/whitechess.png);"))
+        self.userInfo.chessArray[n][m].setFrameShape(QFrame.NoFrame)
+        self.userInfo.chessArray[n][m].show()
+        self.userInfo.IsNext = True
+        self.infotext.setText(_fromUtf8("我方下"))
+        self.userInfo.chessboard.update()
+
     def GoingChess(self, data):
         self.infotext.setText(_fromUtf8("可以正式比赛了"))
         self.setButtonStatus(False, True, True, False, True, True)
@@ -481,9 +505,24 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         if event.button() == Qt.LeftButton:
             self.paint(event.pos().x(), event.pos().y())
 
+
     # 绘制棋子
     def paint(self, x, y):
         n, m = self.userInfo.leftMousePressEvent(x, y)
+        # 绘制当前棋子
+        if n != -1:
+            self.userInfo.chessStatus[n][m] = (x, y, self.userInfo.chessType)
+            self.userInfo.path.append([n, m])
+            self.userInfo.chessArray[n][m] = QGraphicsView(self.userInfo.chessboard)
+            self.userInfo.chessArray[n][m].setGeometry(QRect(32 * n, 32 * m, 32, 32))
+            if self.userInfo.chessType == BLACK_CHESS:
+                self.userInfo.chessArray[n][m].setStyleSheet(_fromUtf8("background-image:url(:images/blackchess.png)"))
+            elif self.userInfo.chessType == WHITE_CHESS:
+                self.userInfo.chessArray[n][m].setStyleSheet(_fromUtf8("background-image:url(:images/whitechess.png)"))
+            self.userInfo.chessArray[n][m].setFrameShape(QFrame.NoFrame)
+            self.userInfo.chessArray[n][m].show()
+            self.userInfo.chessboard.update()
+            self.infotext.setText("我下完了，到您了".decode('utf-8'))
         if n != -1:
             data = {'sid': 100, 'cid': 1006, 'm': m, 'n': n, 'userlist': [self.userInfo.opponent], 'chesscnt': self.userInfo.chessCnt}
             self.ns.send(json.dumps(data))

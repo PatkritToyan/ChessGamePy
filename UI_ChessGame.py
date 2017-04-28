@@ -348,6 +348,31 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/images/chesslogo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+        self.appName.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 18px; font-weight: bold; color: #FF6A6A"))
+        self.textEdit_3.setStyleSheet(_fromUtf8("font-family: 宋体; font-size: 12px; color: #8B2500"))
+        self.rule.setStyleSheet(_fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.singleRoomChatTitle.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.groupChatTitle.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.userRankList.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
+        self.hallList.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.userone.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.usertwo.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
+        self.scoreStatus1.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#8B1A1A"))
+        self.scoreStatus2.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#8B1A1A"))
+        self.scoreListWigdet.setStyleSheet(
+            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#9ACD32"))
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)

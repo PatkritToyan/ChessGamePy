@@ -49,14 +49,11 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.timer = QTimer()
         self.loopCnt = 40
         self.tickCnt = 100
-        # 默认第一次进入大厅
-        self.FirstTime = True
 
     # 初始化UI
     def __init__ui(self):
         self.setupUi(self)
         self.setWindowTitle(_fromUtf8(self.username))
-        self.setUiStyleSheet()
         self.userInfo = ChessBoard(self.username, self.chessboard, self.infotext)
         self.setButtonStatus(False, False, False, False, False, False)
         # 设置聊天框只读
@@ -92,34 +89,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.__init__config()
         self.__init__ui()
         self.timer.start(50)
-
-    def setUiStyleSheet(self):
-        icon = QIcon()
-        icon.addPixmap(QPixmap(_fromUtf8(":/images/chesslogo.png")), QIcon.Normal, QIcon.Off)
-        self.setWindowIcon(icon)
-        self.appName.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 18px; font-weight: bold; color: #FF6A6A"))
-        self.textEdit_3.setStyleSheet(_fromUtf8("font-family: 宋体; font-size: 12px; color: #8B2500"))
-        self.rule.setStyleSheet(_fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.singleRoomChatTitle.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.groupChatTitle.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.userRankList.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color: #FF6A6A"))
-        self.hallList.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
-        self.userone.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
-        self.usertwo.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 12px; font-weight: bold; color: #FF6A6A"))
-        self.scoreStatus1.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#8B1A1A"))
-        self.scoreStatus2.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#8B1A1A"))
-        self.scoreListWigdet.setStyleSheet(
-            _fromUtf8("font-family: Papyrus; font-size: 14px; font-weight: bold; color:#9ACD32")
-        )
 
     def setButtonStatus(self, readyStatus, giveupStatus, peaceStatus, againStatus, leaveoutStatus, singleChatStatus):
         self.readyBt.setEnabled(readyStatus)
@@ -444,7 +413,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         if self.scoreList:
             tmpcnt = 0
             newScoreList = sorted(self.scoreList.iteritems(), key=lambda d: d[1], reverse=True)
-            # print newScoreList
             self.scoreListWigdet.clear()
             if len(newScoreList) >= 3:
                 self.scoreListWigdet.addItem("第一名".decode('utf-8'))
@@ -487,7 +455,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         self.userInfo.IsBegin = True
         self.chessboard.mouseReleaseEvent = self.releaseAction
         # 如果白棋是自己的名字 那么自己的五子棋类型是白棋
-
         if data['white'] == self.userInfo.name.decode('utf-8'):
             self.infotext.setText(_fromUtf8('你是白棋，你后手'))
             self.userInfo.chessType = WHITE_CHESS
@@ -558,7 +525,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
         else:
             data = {'sid': 106, 'cid': 1003, 'message': stalkMsg,
                     'userlist': [self.userInfo.opponent, self.userInfo.name], 'user': self.userInfo.name}
-        # logging.debug("sendGroupMsgEvent data userlist() %s" % data['userlist'])
         self.ns.send(json.dumps(data))
         self.ns.process()
 

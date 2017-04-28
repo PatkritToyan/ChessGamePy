@@ -81,7 +81,6 @@ class ClientLogin_launcher(QWidget, Ui_Dialog):
             data = self.ns.recv()
             logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
             logging.debug(" serverConnection data() x: %s" % data)
-            print 'serverconnection'
             if len(data) > 0:
                 # 约定协议为json格式
                 data = json.loads(data)

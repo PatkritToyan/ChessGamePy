@@ -83,6 +83,12 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def outofServer(self):
         data = {'sid': 110, 'user': self.userInfo.name}
         self.ns.send(json.dumps(data))
+        if self.userInfo.IsInRoom:
+            self.userInfo.IsInRoom = False
+            msg = {'sid': 100, 'cid': 1003, 'roomid': self.userInfo.roomId - 1,
+                   'tableid': self.userInfo.tableId - 1, 'user': self.userInfo.name,
+                   'opponent': self.userInfo.opponent}
+            self.ns.send(json.dumps(msg))
         self.close()
     # 连接服务器
     def connectToServer(self):

@@ -14,11 +14,10 @@ class TableShowService(object):
         # 显示每个用户当前的状态
         self.state = {}
         # 每个用户的得分列表
-        confile = "playerconfig.ini"
+        confile = "scoreRecord.ini"
         if os.access(confile, os.F_OK) and os.access(confile, os.R_OK):
             self.importIni(confile)
         else:
-            print 'no'
             self.scoreList = {}
 
 
@@ -50,7 +49,8 @@ class TableShowService(object):
 
     def exportIni(self, file):
         cf = ConfigParser.SafeConfigParser()
-        cf.add_section('Player')
+        if not cf.has_section('Player'):
+            cf.add_section('Player')
         cf.set('Player', 'scorelist', json.dumps(self.scoreList))
         with codecs.open(file, 'w+', encoding='utf-8') as f:
             cf.write(f)
@@ -163,6 +163,6 @@ class TableShowService(object):
 
     # 获得分数列表
     def getScoreList(self, msg):
-        self.exportIni('./playerconfig.ini')
+        self.exportIni('./scoreRecord.ini')
         data = {'sid': 100, 'cid': 1009, 'scorelist': self.scoreList, 'sendType': 2}
         return data

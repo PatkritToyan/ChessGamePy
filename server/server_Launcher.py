@@ -17,10 +17,31 @@ class Server_Launcher(object):
         self.host.startup(9999)
         print('service startup at port', self.host.port)
         self.host.settimer(2000)
-        confile = "playerconfig.ini"
-        self.userList = {}  # 历史 所有用户列表
+        self.confile = "userRecord.ini"
+        if os.access(self.confile, os.F_OK) and os.access(self.confile, os.R_OK):
+            self.importIni(self.confile)
+        else:
+            self.userList = {}
+        # self.userList = {}  # 历史 所有用户列表
         self.onlineUserlist = {}    # 在线 用户列表
 
+    def importIni(self, file):
+        try:
+            cf = ConfigParser.SafeConfigParser()
+            with codecs.open(file, 'r', encoding='utf-8') as f:
+                cf.readfp(f)
+            self.userList = json.loads(cf.get('Player', 'userlist'))
+        except:
+            self.userList = {}
+            print 'Bad config file.'
+
+    def exportIni(self, file):
+        cf = ConfigParser.SafeConfigParser()
+        cf.add_section('Player')
+        cf.set('Player', 'userlist', json.dumps(self.userList))
+        with codecs.open(file, 'w+', encoding='utf-8') as f:
+            cf.write(f)
+        f.close()
 
 if __name__ == '__main__':
 
@@ -51,6 +72,7 @@ if __name__ == '__main__':
                 else:
                     msg = {'sid': 120, 'reply': 'success'}
                     server.userList[data['user']] = wparam
+                    server.exportIni(server.confile)
                     server.onlineUserlist[data['user']] = wparam
                 server.host.send(wparam, json.dumps(msg))
             elif data['sid'] == 110:  # 用户离线，移除在线名单

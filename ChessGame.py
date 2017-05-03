@@ -54,8 +54,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def __init__ui(self):
         self.setupUi(self)
         self.setWindowTitle(_fromUtf8(self.username))
-
-
         self.userInfo = ChessBoard(self.username, self.chessboard, self.infotext)
         self.setButtonStatus(False, False, False, False, False, False)
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -80,10 +78,6 @@ class ChessGame(QMainWindow, Ui_MainWindow):
     def moveEvent(self, event):
         self.emit(SIGNAL("parentMoved(QPoint)"), event.pos() - event.oldPos())
         self.emit(SIGNAL("mouseleavetable()"))
-
-    def resizeEvent(self, event):
-        self.emit(SIGNAL("parenResized(QSize)"), event.size() - event.oldSize())
-        self.emit(SIGNAL('mouseleavetable()'))
 
     #退出客户端
     def outofServer(self):
@@ -345,6 +339,7 @@ class ChessGame(QMainWindow, Ui_MainWindow):
                         else:
                             QMessageBox.information(self, _fromUtf8("提示"), _fromUtf8("对手拒绝了你的请求"))
                 elif data['sid'] == 105:
+                    # 收到心跳包
                     pass
                 elif data['sid'] == 106:
                     now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())

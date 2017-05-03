@@ -22,7 +22,7 @@ class ChessGameService(object):
         return f(msg)
 
     def register(self, cid, function):
-        self.__command_map[cid] =  function
+        self.__command_map[cid] = function
 
     def registers(self, CommandDict):
         self.__command_map = {}

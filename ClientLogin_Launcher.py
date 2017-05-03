@@ -79,25 +79,19 @@ class ClientLogin_launcher(QWidget, Ui_Dialog):
         self.ns.process()
         if self.ns.status() == netstream.NET_STATE_ESTABLISHED:
             data = self.ns.recv()
-            logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s] %(name)s:%(levelname)s: %(message)s')
-            logging.debug(" serverConnection data() x: %s" % data)
             if len(data) > 0:
                 # 约定协议为json格式
                 data = json.loads(data)
                 if data['sid'] == 101:
-                    print '101'
                     message = {'sid': 103, 'user': self.username}
                     self.ns.send(json.dumps(message))
                     self.ns.process()
                 elif data['sid'] == 120:
-                    print '120'
                     if data['reply'] == 'error':
-                        QMessageBox.information(self, _fromUtf8('提示'), _fromUtf8("用户名冲突，请更换用户名！"))
+                        self.loginError()
                     else:
                         print 'login success'
                         self.loginSuccess()
-                else:
-                    self.loginError()
 
 
 class MyApplication(QApplication):

@@ -20,9 +20,9 @@ class TableShowService(object):
         else:
             self.scoreList = {}
 
-
         for i in range(100):
             self.userList.append([])
+
         commands = {
             1001: self.getTableList,
             1002: self.userIn,

@@ -6,7 +6,7 @@ class TickService(object):
 
     def __init__(self):
         commands = {
-            1001:self.tickResponse,
+            1001: self.tickResponse
         }
         self.registers(commands)
 

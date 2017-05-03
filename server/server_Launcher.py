@@ -2,11 +2,11 @@
 
 import json, logging
 from netstream import *
-from dispatcher import *
-from TableShowService import *
-from ChessGameService import *
-from ChatService import *
-from TickService import *
+from dispatcher import dispatcher
+from TableShowService import TableShowService
+from ChessGameService import ChessGameService
+from ChatService import ChatService
+from TickService import TickService
 import ConfigParser, os, codecs
 
 
@@ -56,7 +56,6 @@ if __name__ == '__main__':
     while True:
         server.host.process()
         event, wparam, lparam, data = server.host.read()
-
         if event < 0:
             continue
         # 处理玩家数据
@@ -83,8 +82,9 @@ if __name__ == '__main__':
                     server.host.send(wparam, json.dumps(result))
                 # 将服务端处理完的数据返回给所有人
                 elif result['sendType'] == 2:
-                    for user in server.userList.keys():
-                        server.host.send(server.userList[user], json.dumps(result))
+                    # for user in server.userList.keys():
+                    for key in server.userList:
+                        server.host.send(server.onlineUserlist[key], json.dumps(result))
                 # 将服务端处理完的数据返回给 部分人
                 elif result['sendType'] == 3:
                     if result['userlist']:
@@ -112,7 +112,7 @@ if __name__ == '__main__':
             # 发送桌子列表
             data = {'sid': 100, 'cid': 1001}
             result = dispatch.dispatch(data)
-            for user in server.userList.keys():
+            for user in server.userList:
                 server.host.send(server.userList[user], json.dumps(result))
         # 处理玩家离开 此时如果玩家还在房间 客户端会给服务器发送一条信息 告知对手 我已经离开房间了 处理逻辑在客户端点击X按钮
         elif event == NET_LEAVE:
